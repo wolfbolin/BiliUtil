@@ -7,6 +7,7 @@ import BiliUtil.static_func as f
 
 class User:
     uid = None
+
     name = None
     birthday = None
     coin = None
@@ -18,16 +19,26 @@ class User:
 
     def __init__(self, uid):
         print('(=・ω・=)创建用户对象(=・ω・=)')
-        self.set_user(str(uid))
-
-    def get_mid(self):
-        # 在B站的系统中存在uid与mid混用的情况
-        return self.uid
+        self.uid = uid
 
     def set_user(self, uid):
+        self.uid = uid
+        self.name = None
+        self.birthday = None
+        self.coin = None
+        self.face = None
+        self.time = None
+        self.level = None
+        self.sex = None
+        self.sign = None
+
+    def get_user_info(self):
+        if self.uid is None:
+            raise BaseException('缺少必要的参数')
+
         f.print_1('正在获取用户信息...', end='')
         param = {
-            'mid': str(uid),
+            'mid': str(self.uid),
             'jsonp': 'jsonp'
         }
         http_result = requests.get(url=v.URL_UP_INFO, params=param,
@@ -53,47 +64,6 @@ class User:
 
         return self
 
-    def get_user_info(self):
-        user_info = {
-            'uid': {
-                'k': '用户ID',
-                'v': self.uid
-            },
-            'mid': {
-                'k': '用户ID',
-                'v': self.uid
-            },
-            'name': {
-                'k': '用户昵称',
-                'v': self.name
-            },
-            'birthday': {
-                'k': '生日',
-                'v': self.birthday
-            },
-            'coin': {
-                'k': '硬币',
-                'v': self.coin
-            },
-            'face': {
-                'k': '头像',
-                'v': self.face
-            },
-            'time': {
-                'k': '创号',
-                'v': self.time
-            },
-            'level': {
-                'k': '等级',
-                'v': self.level
-            },
-            'sex': {
-                'k': '性别',
-                'v': self.sex
-            },
-            'sign': {
-                'k': '签名',
-                'v': self.sign
-            }
-        }
-        return user_info
+    def get_json_info(self):
+        json_data = vars(self).copy()
+        return json_data

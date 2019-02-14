@@ -77,10 +77,16 @@ class Video:
         if json_data['code'] != 0:
             raise BaseException('获取数据的过程发生错误')
 
-        self.quality = json_data['data']['quality']
-        self.length = json_data['data']['timelength']
-        self.video = json_data['data']['dash']['video'][-1]['baseUrl']
-        self.audio = json_data['data']['dash']['audio'][0]['baseUrl']
+        # 自动识别不同的数据来源
+        if 'dash' in json_data['data']:
+            self.quality = json_data['data']['quality']
+            self.length = json_data['data']['timelength']
+            self.video = json_data['data']['dash']['video'][-1]['baseUrl']
+            self.audio = json_data['data']['dash']['audio'][0]['baseUrl']
+        elif 'durl' in json_data['data']:
+            self.quality = json_data['data']['quality']
+            self.length = json_data['data']['timelength']
+            self.video = json_data['data']['durl'][-1]['url']
 
         for index, val in enumerate(json_data['data']['accept_quality']):
             if val == self.quality:
@@ -89,12 +95,13 @@ class Video:
 
         return self
 
-    def get_video(self, base_path='', name_path=False):
+    def get_video_data(self, base_path='', name_path=False):
         if self.video is None and self.audio is None:
             self.get_video_info()
 
         if name_path:
-            cache_path = base_path + './{}'.format(self.name)
+            temp_name = self.name.replace('/', '-')  # 避免特殊字符
+            cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.cid)
         if not os.path.exists(cache_path):
@@ -104,34 +111,33 @@ class Video:
         f.print_1('正在下载视频和配套音--', end='')
         f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
         f.print_cyan('==============================================================')
-        referer = 'https://www.bilibili.com/video/av' + str(self.aid)
-        audio_shell = "powershell aria2c -c -s 2 -o'{}/{}_{}.aac' --referer={} '{}'"
-        audio_process = subprocess.Popen(
-            audio_shell.format(cache_path, self.cid, self.quality_des, referer, self.audio))
-
-        video_shell = "powershell aria2c -c -s 2 -o'{}/{}_{}.flv' --referer={} '{}'"
-        video_process = subprocess.Popen(
-            video_shell.format(cache_path, self.cid, self.quality_des, referer, self.video))
-
-        audio_process.wait()
-        video_process.wait()
-
-        f.print_cyan('==============================================================')
-
-        audio_cache_path = '{}/{}_{}.aac'.format(cache_path, self.cid, self.quality_des)
-        video_cache_path = '{}/{}_{}.flv'.format(cache_path, self.cid, self.quality_des)
-        if os.path.exists(audio_cache_path) and os.path.exists(video_cache_path):
-            f.print_g('[OK]', end='')
-            f.print_1('视频与配套音频下载成功--', end='')
-            f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
+        if self.audio is not None and self.video is not None:
+            self.aria2c_download(cache_path, '{}_{}.aac'.format(self.cid, self.quality_des), self.audio)
+            self.aria2c_download(cache_path, '{}_{}.flv'.format(self.cid, self.quality_des), self.video)
+        if self.video is not None and self.audio is None:
+            self.aria2c_download(cache_path, '{}_{}.mp4'.format(self.cid, self.quality_des), self.video)
         else:
-            f.print_r('[ERR]', end='')
-            f.print_1('视频或配套音频下载失败--', end='')
-            f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
-            raise BaseException('av:{},cv:{},下载失败'.format(self.aid, self.cid))
+            f.print_y('无需独立下载音频')
+        f.print_cyan('==============================================================')
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_json_info())))
+
+    def aria2c_download(self, cache_path, file_name, download_url):
+        referer = 'https://www.bilibili.com/video/av' + str(self.aid)
+        file_path = '{}/{}'.format(cache_path, file_name)
+        shell = "powershell aria2c -c -s 2 -o'{}' --referer={} '{}'"
+        process = subprocess.Popen(shell.format(file_path, referer, download_url))
+        process.wait()
+        if os.path.exists(file_path):
+            f.print_g('[OK]', end='')
+            f.print_1('文件{}下载成功--'.format(file_name), end='')
+            f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
+        else:
+            f.print_r('[ERR]', end='')
+            f.print_1('文件{}下载失败--'.format(file_name), end='')
+            f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
+            raise BaseException('av:{},cv:{},下载失败'.format(self.aid, self.cid))
 
     def get_json_info(self):
         json_data = vars(self).copy()
