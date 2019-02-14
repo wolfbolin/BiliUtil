@@ -1,20 +1,31 @@
 import json
 import requests
 
-import BiliUtil_old.static_value as v
-import BiliUtil_old.static_func as f
+import BiliUtil.static_value as v
+import BiliUtil.static_func as f
 
 
 class User:
+    uid = None
+    name = None
+    birthday = None
+    coin = None
+    face = None
+    time = None
+    level = None
+    sex = None
+    sign = None
+
     def __init__(self, uid):
         print('(=・ω・=)创建用户对象(=・ω・=)')
-        self.set_uid(str(uid))
+        self.set_user(str(uid))
 
-    uid = None
-    user_info = dict()
+    def get_mid(self):
+        # 在B站的系统中存在uid与mid混用的情况
+        return self.uid
 
-    def set_uid(self, uid):
-        self.uid = str(uid)
+    def set_user(self, uid):
+        f.print_1('正在获取用户信息...', end='')
         param = {
             'mid': str(uid),
             'jsonp': 'jsonp'
@@ -29,58 +40,60 @@ class User:
         if json_data['code'] != 0:
             raise BaseException('获取数据的过程发生错误')
 
-        self.user_info = {
+        # 修改对象信息
+        self.uid = json_data['data']['mid']
+        self.name = json_data['data']['name']
+        self.birthday = json_data['data']['birthday']
+        self.coin = json_data['data']['coins']
+        self.face = json_data['data']['face']
+        self.time = json_data['data']['time']
+        self.level = json_data['data']['level']
+        self.sex = json_data['data']['sex']
+        self.sign = json_data['data']['sign']
+
+        return self
+
+    def get_user_info(self):
+        user_info = {
             'uid': {
                 'k': '用户ID',
-                'v': json_data['data']['mid']
+                'v': self.uid
             },
             'mid': {
                 'k': '用户ID',
-                'v': json_data['data']['mid']
+                'v': self.uid
             },
             'name': {
                 'k': '用户昵称',
-                'v': json_data['data']['name']
+                'v': self.name
             },
             'birthday': {
                 'k': '生日',
-                'v': json_data['data']['birthday']
+                'v': self.birthday
             },
             'coin': {
                 'k': '硬币',
-                'v': json_data['data']['coins']
+                'v': self.coin
             },
             'face': {
                 'k': '头像',
-                'v': json_data['data']['face']
+                'v': self.face
             },
             'time': {
                 'k': '创号',
-                'v': json_data['data']['jointime']
+                'v': self.time
             },
             'level': {
                 'k': '等级',
-                'v': json_data['data']['level']
+                'v': self.level
             },
             'sex': {
                 'k': '性别',
-                'v': json_data['data']['sex']
+                'v': self.sex
             },
             'sign': {
                 'k': '签名',
-                'v': json_data['data']['sign']
+                'v': self.sign
             }
         }
-
-        return True
-
-    def get_user_info(self):
-        return self.user_info
-
-    def get_info_key(self, key):
-        return self.user_info[key]['k']
-
-    def get_info_val(self, key):
-        return self.user_info[key]['v']
-
-
+        return user_info

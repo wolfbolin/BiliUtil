@@ -1,5 +1,5 @@
 from urllib import parse
-import BiliUtil_old.static_value as v
+import BiliUtil.static_value as v
 from fake_useragent import UserAgent
 
 
