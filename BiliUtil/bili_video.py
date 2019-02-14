@@ -16,6 +16,7 @@ class Video:
     name = None  # Page name 分P名称
 
     quality = None
+    quality_des = None
     length = None
     video = None
     audio = None
@@ -42,7 +43,7 @@ class Video:
             self.cookie = {
                 'SESSDATA': cookie['SESSDATA']
             }
-        elif isinstance(cookie, str):
+        elif isinstance(cookie, str) and len(cookie) > 0:
             for line in cookie.split(';'):
                 name, value = line.strip().split('=', 1)
                 if name == 'SESSDATA':
@@ -61,12 +62,12 @@ class Video:
         param = {
             'avid': str(self.aid),
             'cid': str(self.cid),
-            'qn': qn,  # 默认尝试1080P 60fps
+            'qn': qn,  # 默认使用最高画质下载
             'otype': 'json',
             'fnver': 0,
             'fnval': 16
         }
-        http_result = requests.get(v.URL_UP_VIDEO, params=param,
+        http_result = requests.get(v.URL_UP_VIDEO, params=param, cookies=self.cookie,
                                    headers=f.new_http_header(v.URL_UP_INFO))
         if http_result.status_code == 200:
             f.print_g('OK {}'.format(http_result.status_code))
@@ -80,6 +81,11 @@ class Video:
         self.length = json_data['data']['timelength']
         self.video = json_data['data']['dash']['video'][-1]['baseUrl']
         self.audio = json_data['data']['dash']['audio'][0]['baseUrl']
+
+        for index, val in enumerate(json_data['data']['accept_quality']):
+            if val == self.quality:
+                self.quality_des = json_data['data']['accept_description'][index]
+                break
 
         return self
 
@@ -99,21 +105,21 @@ class Video:
         f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
         f.print_cyan('==============================================================')
         referer = 'https://www.bilibili.com/video/av' + str(self.aid)
-        audio_shell = "powershell aria2c -c -s 2 -o'{}/{}.aac' --referer={} '{}'"
+        audio_shell = "powershell aria2c -c -s 2 -o'{}/{}_{}.aac' --referer={} '{}'"
         audio_process = subprocess.Popen(
-            audio_shell.format(cache_path, self.cid, referer, self.audio))
+            audio_shell.format(cache_path, self.cid, self.quality_des, referer, self.audio))
 
-        video_shell = "powershell aria2c -c -s 2 -o'{}/{}.flv' --referer={} '{}'"
+        video_shell = "powershell aria2c -c -s 2 -o'{}/{}_{}.flv' --referer={} '{}'"
         video_process = subprocess.Popen(
-            video_shell.format(cache_path, self.cid, referer, self.video))
+            video_shell.format(cache_path, self.cid, self.quality_des, referer, self.video))
 
         audio_process.wait()
         video_process.wait()
 
         f.print_cyan('==============================================================')
 
-        audio_cache_path = '{}/{}.aac'.format(cache_path, self.cid)
-        video_cache_path = '{}/{}.flv'.format(cache_path, self.cid)
+        audio_cache_path = '{}/{}_{}.aac'.format(cache_path, self.cid, self.quality_des)
+        video_cache_path = '{}/{}_{}.flv'.format(cache_path, self.cid, self.quality_des)
         if os.path.exists(audio_cache_path) and os.path.exists(video_cache_path):
             f.print_g('[OK]', end='')
             f.print_1('视频与配套音频下载成功--', end='')

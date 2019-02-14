@@ -38,6 +38,8 @@ class Album:
 
     def set_cookie(self, cookie):
         self.cookie = cookie
+        for video in self.video:
+            video.set_cookie(cookie)
 
     def get_album_info(self):
         if self.aid is None:
@@ -75,9 +77,7 @@ class Album:
 
         for page in json_data['data']['pages']:
             cv = Video(self.aid, page['cid'], page['page'], page['part'])
-            if self.cookie is not None:
-                # 分发cookie，提升下载画质
-                cv.set_cookie(self.cookie)
+            cv.set_cookie(self.cookie)
             self.video.append(cv)
 
         return self
