@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import requests
 import subprocess
@@ -100,7 +101,7 @@ class Video:
             self.get_video_info()
 
         if name_path:
-            temp_name = self.name.replace('/', '-')  # 避免特殊字符
+            temp_name = re.sub('[\\\\/:*?"<>|\']', '-', self.name)  # 避免特殊字符
             cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.cid)
@@ -121,7 +122,7 @@ class Video:
         f.print_cyan('==============================================================')
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
-            file.write(str(json.dumps(self.get_json_info())))
+            file.write(str(json.dumps(self.get_dict_info())))
 
     def aria2c_download(self, cache_path, file_name, download_url):
         referer = 'https://www.bilibili.com/video/av' + str(self.aid)
@@ -137,8 +138,9 @@ class Video:
             f.print_r('[ERR]', end='')
             f.print_1('文件{}下载失败--'.format(file_name), end='')
             f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
+            f.print_r(shell.format(file_path, referer, download_url))
             raise BaseException('av:{},cv:{},下载失败'.format(self.aid, self.cid))
 
-    def get_json_info(self):
+    def get_dict_info(self):
         json_data = vars(self).copy()
         return json_data

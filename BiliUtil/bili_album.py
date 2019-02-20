@@ -104,7 +104,7 @@ class Album:
             self.get_album_info()
 
         if name_path:
-            temp_name = self.name.replace('/', '-')  # 避免特殊字符
+            temp_name = re.sub('[\\\\/:*?"<>|\']', '-', self.name)  # 避免特殊字符
             cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.aid)
@@ -123,13 +123,13 @@ class Album:
             video.get_video_data(cache_path, name_path)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
-            file.write(str(json.dumps(self.get_json_info())))
+            file.write(str(json.dumps(self.get_dict_info())))
 
-    def get_json_info(self):
+    def get_dict_info(self):
         json_data = vars(self).copy()
         video_list = []
         if 'video_list' in json_data:
             for video in json_data['video_list']:
-                video_list.append(video.get_json_info())
+                video_list.append(video.get_dict_info())
             json_data['video_list'] = video_list
         return json_data

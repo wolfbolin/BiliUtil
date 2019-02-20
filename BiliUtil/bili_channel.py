@@ -86,7 +86,7 @@ class Channel:
             self.get_channel_info()
 
         if name_path:
-            temp_name = self.name.replace('/', '-')  # 避免特殊字符
+            temp_name = re.sub('[\\\\/:*?"<>|\']', '-', self.name)  # 避免特殊字符
             cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.cid)
@@ -105,12 +105,12 @@ class Channel:
             album.get_album_data(cache_path, name_path)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
-            file.write(str(json.dumps(self.get_json_info())))
+            file.write(str(json.dumps(self.get_dict_info())))
 
-    def get_json_info(self):
+    def get_dict_info(self):
         json_data = vars(self).copy()
         album_list = []
         for album in json_data['album_list']:
-            album_list.append(album.get_json_info())
+            album_list.append(album.get_dict_info())
         json_data['album_list'] = album_list
         return json_data

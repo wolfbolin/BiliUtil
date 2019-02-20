@@ -64,6 +64,6 @@ class User:
 
         return self
 
-    def get_json_info(self):
+    def get_dict_info(self):
         json_data = vars(self).copy()
         return json_data
