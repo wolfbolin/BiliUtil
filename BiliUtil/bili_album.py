@@ -104,7 +104,11 @@ class Album:
             self.get_album_info()
 
         if name_path:
-            temp_name = re.sub('[\\\\/:*?"<>|\']', '-', self.name)  # 避免特殊字符
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            print('album_name', temp_name)
+            if len(temp_name) == 0:
+                temp_name = self.aid
             cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.aid)

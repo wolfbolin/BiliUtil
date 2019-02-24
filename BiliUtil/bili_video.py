@@ -101,7 +101,12 @@ class Video:
             self.get_video_info()
 
         if name_path:
-            temp_name = re.sub('[\\\\/:*?"<>|\']', '-', self.name)  # 避免特殊字符
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            temp_name = re.sub(r'[‘’]', '_', temp_name)
+            print('video_name', temp_name)
+            if len(temp_name) == 0:
+                temp_name = self.cid
             cache_path = base_path + './{}'.format(temp_name)
         else:
             cache_path = base_path + './{}'.format(self.cid)
@@ -127,7 +132,7 @@ class Video:
     def aria2c_download(self, cache_path, file_name, download_url):
         referer = 'https://www.bilibili.com/video/av' + str(self.aid)
         file_path = '{}/{}'.format(cache_path, file_name)
-        shell = "powershell aria2c -c -s 2 -o'{}' --referer={} '{}'"
+        shell = "powershell aria2c -c -s 1 -o'{}' --referer={} '{}'"
         process = subprocess.Popen(shell.format(file_path, referer, download_url))
         process.wait()
         if os.path.exists(file_path):

@@ -5,4 +5,4 @@ if __name__ == '__main__':
     ch = BiliUtil.Channel()
     ch.set_by_url('https://space.bilibili.com/4282930/channel/detail?cid=48758')
     ch.set_cookie(cookie)
-    ch.get_channel_data(base_path='Download', name_path=False)
+    ch.get_channel_data(base_path='Download', name_path=True)
