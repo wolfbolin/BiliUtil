@@ -7,6 +7,7 @@ from urllib import parse
 import BiliUtil.static_value as v
 import BiliUtil.static_func as f
 from BiliUtil.bili_album import Album
+from BiliUtil.bili_channel import Channel
 
 
 class User:
@@ -87,8 +88,64 @@ class User:
 
         return self
 
-    # def get_channel_video(self):
-    #     # 获取所有频道的所有视频
+    def get_channel_video_info(self):
+        # 获取UP所有频道的所有视频
+        if self.uid is None:
+            raise BaseException('缺少必要的参数')
+
+        if self.name is None:
+            self.get_user_info()
+
+        f.print_1('正在获取频道列表...', end='')
+        param = {
+            'mid': str(self.uid),
+            'guest': False,
+            'jsonp': 'jsonp'
+        }
+        http_result = requests.get(v.URL_UP_CHANNELS, params=param,
+                                   headers=f.new_http_header(v.URL_UP_CHANNELS))
+        if http_result.status_code == 200:
+            f.print_g('OK {}'.format(http_result.status_code))
+        else:
+            f.print_r('RE {}'.format(http_result.status_code))
+        json_data = json.loads(http_result.text)
+        if json_data['code'] != 0:
+            raise BaseException('获取数据的过程发生错误')
+
+        for channel in json_data['data']['list']:
+            ch = Channel(self.uid, channel['cid'])
+            ch.set_cookie(self.cookie)
+            self.channel_list.append(ch)
+
+    def get_channel_video_data(self, base_path='', name_path=False, max_length=None):
+        # 获取UP主的所有视频的数据
+        if len(self.channel_list) == 0:
+            self.get_channel_video_info()
+
+        if name_path:
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            if len(temp_name) == 0:
+                temp_name = self.uid
+            cache_path = base_path + './{}'.format(temp_name)
+        else:
+            cache_path = base_path + './{}'.format(self.uid)
+        if not os.path.exists(cache_path):
+            os.makedirs(cache_path)
+
+        f.print_1('正在获取用户头像--', end='')
+        f.print_b('user:{}'.format(self.name))
+        http_result = requests.get(self.face)
+        with open(cache_path + '/face.jpg', 'wb') as file:
+            file.write(http_result.content)
+        f.print_g('[OK]', end='')
+        f.print_1('用户头像已保存')
+
+        for channel in self.channel_list:
+            channel.get_channel_data(cache_path, name_path, max_length)
+
+        with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
+            file.write(str(json.dumps(self.get_dict_info())))
 
     def get_all_video_info(self):
         # 获取UP主的所有视频的列表信息
@@ -100,7 +157,7 @@ class User:
 
         f.print_1('正在获取视频列表...', end='')
         param = {
-            'mid': self.uid,
+            'mid': str(self.uid),
             'pagesize': 30,
             'tid': 0,
             'page': 1,
@@ -129,7 +186,7 @@ class User:
                 param['pn'] += 1
 
     def get_all_video_data(self, base_path='', name_path=False, max_length=None):
-        # 获取UP主的所有视频的列表
+        # 获取UP主的所有视频的数据
         if len(self.album_list) == 0:
             self.get_all_video_info()
 

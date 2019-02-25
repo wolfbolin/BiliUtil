@@ -26,7 +26,7 @@ class Album:
     share = None
     view = None
     danmu = None
-    video_list = []
+    video_list = list()
 
     def __init__(self, aid=None):
         print('(=・ω・=)创建集合对象(=・ω・=)')
@@ -46,7 +46,7 @@ class Album:
         self.share = None
         self.view = None
         self.danmu = None
-        self.video_list = []
+        self.video_list = list()
 
     def set_by_url(self, url):
         input_url = parse.urlparse(url)
