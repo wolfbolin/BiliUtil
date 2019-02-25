@@ -96,15 +96,18 @@ class Video:
 
         return self
 
-    def get_video_data(self, base_path='', name_path=False):
+    def get_video_data(self, base_path='', name_path=False, max_length=None):
         if self.video is None and self.audio is None:
             self.get_video_info()
+
+        if max_length is not None and max_length < self.length:
+            f.print_y('视频：{}，超出限定长度取消下载')
+            return
 
         if name_path:
             # 检查路径名中的特殊字符
             temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
             temp_name = re.sub(r'[‘’]', '_', temp_name)
-            print('video_name', temp_name)
             if len(temp_name) == 0:
                 temp_name = self.cid
             cache_path = base_path + './{}'.format(temp_name)
@@ -116,7 +119,6 @@ class Video:
         # 使用两个进程分别下载视频和音频
         f.print_1('正在下载视频和配套音--', end='')
         f.print_b('av:{},cv:{}'.format(self.aid, self.cid))
-        f.print_cyan('==============================================================')
         if self.audio is not None and self.video is not None:
             self.aria2c_download(cache_path, '{}_{}.aac'.format(self.cid, self.quality_des), self.audio)
             self.aria2c_download(cache_path, '{}_{}.flv'.format(self.cid, self.quality_des), self.video)
