@@ -47,6 +47,7 @@ class Channel:
         if self.uid is None or self.cid is None:
             raise BaseException('缺少必要的参数')
 
+        f.print_1('正在获取视频列表...', end='')
         param = {
             'mid': str(self.uid),
             'cid': str(self.cid),
@@ -55,7 +56,6 @@ class Channel:
             'order': 0  # 默认排序
         }
         while True:
-            f.print_1('正在获取频道信息...', end='')
             http_result = requests.get(v.URL_UP_CHANNEL, params=param,
                                        headers=f.new_http_header(v.URL_UP_CHANNEL))
             if http_result.status_code == 200:
@@ -81,7 +81,7 @@ class Channel:
             else:
                 param['pn'] += 1
 
-    def get_channel_data(self, base_path='', name_path=False):
+    def get_channel_data(self, base_path='', name_path=False, max_length=None):
         if len(self.album_list) == 0:
             self.get_channel_info()
 
@@ -97,7 +97,7 @@ class Channel:
             os.makedirs(cache_path)
 
         f.print_1('正在获取频道封面--', end='')
-        f.print_b('channel:{}'.format(self.cid))
+        f.print_b('channel:{}'.format(self.name))
         http_result = requests.get(self.cover)
         with open(cache_path + '/cover.jpg', 'wb') as file:
             file.write(http_result.content)
@@ -105,7 +105,7 @@ class Channel:
         f.print_1('视频封面已保存')
 
         for album in self.album_list:
-            album.get_album_data(cache_path, name_path)
+            album.get_album_data(cache_path, name_path, max_length)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))

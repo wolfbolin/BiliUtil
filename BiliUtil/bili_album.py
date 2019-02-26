@@ -26,7 +26,7 @@ class Album:
     share = None
     view = None
     danmu = None
-    video_list = []
+    video_list = list()
 
     def __init__(self, aid=None):
         print('(=・ω・=)创建集合对象(=・ω・=)')
@@ -46,7 +46,7 @@ class Album:
         self.share = None
         self.view = None
         self.danmu = None
-        self.video_list = []
+        self.video_list = list()
 
     def set_by_url(self, url):
         input_url = parse.urlparse(url)
@@ -99,14 +99,13 @@ class Album:
 
         return self
 
-    def get_album_data(self, base_path='', name_path=False):
+    def get_album_data(self, base_path='', name_path=False, max_length=None):
         if len(self.video_list) == 0:
             self.get_album_info()
 
         if name_path:
             # 检查路径名中的特殊字符
             temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
-            print('album_name', temp_name)
             if len(temp_name) == 0:
                 temp_name = self.aid
             cache_path = base_path + './{}'.format(temp_name)
@@ -124,7 +123,7 @@ class Album:
         f.print_1('视频封面已保存')
 
         for video in self.video_list:
-            video.get_video_data(cache_path, name_path)
+            video.get_video_data(cache_path, name_path, max_length)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
