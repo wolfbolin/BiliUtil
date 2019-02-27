@@ -23,7 +23,6 @@ class Video:
     audio = None
 
     def __init__(self, aid=None, cid=None, index=None, name=None):
-        print('(=・ω・=)创建视频对象(=・ω・=)')
         self.aid = aid
         self.cid = cid
         self.index = index

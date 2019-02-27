@@ -4,14 +4,21 @@
 
 ![Windows](https://img.shields.io/badge/Windows-support-green.svg)![Linux](https://img.shields.io/badge/Linux-test-orange.svg)![Python](https://img.shields.io/badge/Python-3.6-blue.svg)![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
 
-Bilibili.com（B站）API接口工具包
+Bilibili.com（B站）视频下载工具包
 
 **声明：该内容仅供学习参考，请勿用于商业目的**
+
+*帮助信息请看到[第三章](#help)，更新日志请看到[第四章](#changelog)*
 
 ## 一、安装方式
 
 1. 请使用pip安装该包：`pip install BiliUtil`
-2. 请自行安装`aria2`，并确保该程序在环境变量中。
+2. 若使用视频下载功能，请自行安装配置`aria2`。
+3. 若使用视频合并功能，请自行安装配置`ffmpeg`。
+
+*工具包将自动检查**aria2**和**ffmpeg**环境，若任一环境不存在，所涉及的类与函数将不会被引入*
+
+
 
 ## 二、使用方式
 
@@ -141,7 +148,7 @@ if __name__ == '__main__':
 
 你可以仅获取频道列表而不下载视频，该操作将自动帮你完成用户信息的获取。
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
 	ua = BiliUtil.User(uid='4093899')
@@ -154,7 +161,7 @@ if __name__ == '__main__':
 
 你可以直接下载UP主的全部视频，该操作将自动帮你完成**用户信息**的获取与**频道列表**的获取。该操作支持**设定路径、命名方式、视频时长**，当设置了适合的cookie时，下载的画质将会自动提升。
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
 	ua = BiliUtil.User(uid='4093899')
@@ -287,7 +294,7 @@ if __name__ == '__main__':
 
 你可以直接获取频道内视频数据，该操作将自动帮你完成**频道信息**的获取。该操作支持**设定路径、命名方式、视频时长**，当设置了适合的cookie时，下载的画质将会自动提升。
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
 	ch = BiliUtil.Channel(uid='4093899', cid='8020')
@@ -423,7 +430,7 @@ if __name__ == '__main__':
 
 你可以直接获取专辑内视频数据，该操作将自动帮你完成**专辑信息**的获取。该操作支持**设定路径、命名方式、视频时长**，当设置了适合的cookie时，下载的画质将会自动提升。
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
 	av = BiliUtil.Album(aid='31483746')
@@ -498,7 +505,31 @@ if __name__ == '__main__':
 
 
 
-## 三、帮助信息
+### 5、静态函数
+
+#### 5.1、视频合并函数
+
+众所周知，视频由画面和声音组成。B站自从某个不知道的时间点以后将用户上传的视频分离为**独立的视频与音频**。因此，我们需要将下载好的视频与音频合并为一个文件，这样才方便观看。该函数将帮助你完成这一过程。
+
+使用该函数需要您自行在计算机中配置**ffmpeg**渲染环境，若检查不到该环境存在，音视频合并函数将不会被引入。
+
+> 函数声明：`merge_video_file(path, delete=False)`
+>
+> path：视频所在的文件夹
+>
+> delete：是否在视频合并后删除源文件
+
+```python
+import BiliUtil
+
+if __name__ == '__main__':
+    print('合并文件夹内视频')
+    BiliUtil.merge_video_file('./Download', True)
+```
+
+
+
+## 三、<span id="help">帮助信息</span>
 
 ### 1、cookie信息
 
@@ -533,7 +564,7 @@ if __name__ == '__main__':
 8. 当您重启了相同的下载过程时，aria2将帮助你完成断点续传，下载过的视频将不会重复下载。
 
 *以下代码将演示如何下载频道视频*
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
     cookie = input('请提供登录后的cookie信息，以升级下载画质:')
@@ -559,3 +590,23 @@ if __name__ == '__main__':
 你可以联系我：mailto@wolfbolin.com
 
 **声明：该博客内容仅供学习参考，请勿用于商业目的**
+
+
+
+## 四、<span id="changelog">更新日志</span>
+
+### v0.1.1
+
+新增：
+
+* 音视频合并函数
+* 音视频批量合并代码示例
+
+修改：
+
+* 删除部分无意义的`(=・ω・=)`输出
+* 调整aria2与ffmpeg环境检测机制
+
+### v0.0.1
+
+BiliUtil已经过基础测试，正式发布第一个版本，若要直接使用，请使用pip进行安装。
