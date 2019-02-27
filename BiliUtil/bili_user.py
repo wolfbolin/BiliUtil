@@ -28,7 +28,6 @@ class User:
     channel_list = list()
 
     def __init__(self, uid=None):
-        print('(=・ω・=)创建用户对象(=・ω・=)')
         self.uid = uid
 
     def set_user(self, uid):

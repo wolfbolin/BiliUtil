@@ -29,7 +29,6 @@ class Album:
     video_list = list()
 
     def __init__(self, aid=None):
-        print('(=・ω・=)创建集合对象(=・ω・=)')
         self.aid = aid
 
     def set_album(self, aid=None):
