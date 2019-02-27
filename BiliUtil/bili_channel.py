@@ -21,7 +21,6 @@ class Channel:
     album_list = list()
 
     def __init__(self, uid=None, cid=None):
-        print('(=・ω・=)创建频道对象(=・ω・=)')
         self.set_channel(uid, cid)
 
     def set_channel(self, uid, cid):
