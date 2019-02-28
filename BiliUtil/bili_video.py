@@ -103,15 +103,16 @@ class Video:
             f.print_y('视频：{}，超出限定长度取消下载')
             return
 
+        base_path = os.path.abspath(base_path)  # 获取绝对路径地址
         if name_path:
             # 检查路径名中的特殊字符
             temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
             temp_name = re.sub(r'[‘’]', '_', temp_name)
             if len(temp_name) == 0:
                 temp_name = self.cid
-            cache_path = base_path + './{}'.format(temp_name)
+            cache_path = base_path + '/{}'.format(temp_name)
         else:
-            cache_path = base_path + './{}'.format(self.cid)
+            cache_path = base_path + '/{}'.format(self.cid)
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
 
@@ -132,10 +133,12 @@ class Video:
 
     def aria2c_download(self, cache_path, file_name, download_url):
         referer = 'https://www.bilibili.com/video/av' + str(self.aid)
-        file_path = '{}/{}'.format(cache_path, file_name)
-        shell = "powershell aria2c -c -s 1 -o'{}' --referer={} '{}'"
-        process = subprocess.Popen(shell.format(file_path, referer, download_url))
+        shell = 'aria2c -c -s 1 -d "{}" -o "{}" --referer="{}" "{}"'
+        shell = shell.format(cache_path, file_name, referer, download_url)
+        process = subprocess.Popen(shell)
         process.wait()
+
+        file_path = '{}/{}'.format(cache_path, file_name)
         if os.path.exists(file_path):
             f.print_g('[OK]', end='')
             f.print_1('文件{}下载成功--'.format(file_name), end='')

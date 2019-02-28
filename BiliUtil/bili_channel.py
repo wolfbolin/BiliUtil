@@ -84,14 +84,15 @@ class Channel:
         if len(self.album_list) == 0:
             self.get_channel_info()
 
+        base_path = os.path.abspath(base_path)  # 获取绝对路径地址
         if name_path:
             # 检查路径名中的特殊字符
             temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
             if len(temp_name) == 0:
                 temp_name = self.cid
-            cache_path = base_path + './{}'.format(temp_name)
+            cache_path = base_path + '/{}'.format(temp_name)
         else:
-            cache_path = base_path + './{}'.format(self.cid)
+            cache_path = base_path + '/{}'.format(self.cid)
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
 
