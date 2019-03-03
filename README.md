@@ -595,6 +595,10 @@ if __name__ == '__main__':
 
 ## 四、<span id="changelog">更新日志</span>
 
+### v0.1.4
+
+解决ffmpeg合成阶段程序卡死。由于pipe size的大小限制，导致程序在收到超过64kb的输出时，程序会卡死不动。修改process.wait()为process.communicate()以解决该问题。
+
 ### v0.1.3
 
 操作失误导致pip中v0.1.2版本被删除，将以v0.1.3版本发布。建议更新至最新版本后再使用。

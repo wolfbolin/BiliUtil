@@ -16,5 +16,5 @@ def open_dir(path):
 
 if __name__ == '__main__':
     print('即将扫描下载目录并合并分离的音视频')
-    base_path = './Download'
+    base_path = input('请输入需要深度扫描的路径：')
     open_dir(base_path)
