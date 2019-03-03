@@ -62,7 +62,7 @@ def merge_video_file(path, delete=False):
                     process = subprocess.Popen(shell.format(prefix, prefix, prefix),
                                                stdout=subprocess.PIPE,
                                                stderr=subprocess.PIPE)
-                    process.wait()
+                    process.communicate()
                     if os.path.exists(prefix + '.mp4'):
                         print_1('视频', end='')
                         print_cyan(file_name, end='')
