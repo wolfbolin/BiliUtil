@@ -2,7 +2,10 @@
 
 # BiliUtil
 
-![Windows](https://img.shields.io/badge/Windows-support-green.svg)![Linux](https://img.shields.io/badge/Linux-test-orange.svg)![Python](https://img.shields.io/badge/Python-3.6-blue.svg)![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
+![Windows](https://img.shields.io/badge/Windows-support-green.svg)
+![Linux](https://img.shields.io/badge/Linux-testint-orange.svg)
+![Python](https://img.shields.io/badge/Python-3.6-blue.svg)
+![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
 
 Bilibili.com（B站）视频下载工具包
 
