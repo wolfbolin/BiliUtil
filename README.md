@@ -99,7 +99,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-ua.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+ua.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -273,7 +273,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-ch.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+ch.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -409,7 +409,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-av.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+av.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -540,7 +540,7 @@ if __name__ == '__main__':
 - 通过cookie信息，你可以在下载视频的时候获取到更高清的视频数据，程序会根据你的身份（未登录、已登录、大会员），自动尝试并下载画质最好的视频（手动设置画质的功能写了一半没写完）。
 - 当对象设置了cookie信息后，程序会将该信息分发至该实例所包含的所有Album和Video对象中。声明新的对象以及对象的其他实例不受该操作的影响。
 
-* 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1551761144%2C38d97xyz`的cookie信息也是可以被识别的。也可以传入字典类型的cookie信息，但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
+* 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1123761144%2C38d97xyz`的cookie信息也是可以被识别的。也可以传入字典类型的cookie信息，但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
 * 不同的身份信息可下载视频的映射表：
   * 未登录--->480P
   * 已登录--->1080P
