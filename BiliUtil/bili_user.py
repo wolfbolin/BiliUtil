@@ -85,7 +85,7 @@ class User:
         self.sex = json_data['data']['sex']
         self.sign = json_data['data']['sign']
 
-        return self
+        return vars(self).copy()
 
     def get_channel_video_info(self):
         # 获取UP所有频道的所有视频
@@ -116,7 +116,9 @@ class User:
             ch.set_cookie(self.cookie)
             self.channel_list.append(ch)
 
-    def get_channel_video_data(self, base_path='', name_path=False, max_length=None):
+        return self.channel_list.copy()
+
+    def get_channel_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         # 获取UP主的所有视频的数据
         if len(self.channel_list) == 0:
             self.get_channel_video_info()
@@ -142,7 +144,7 @@ class User:
         f.print_1('用户头像已保存')
 
         for channel in self.channel_list:
-            channel.get_channel_data(cache_path, name_path, max_length)
+            channel.get_channel_data(cache_path, name_path, max_length, exclude_list)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
@@ -185,7 +187,9 @@ class User:
             else:
                 param['pn'] += 1
 
-    def get_all_video_data(self, base_path='', name_path=False, max_length=None):
+        return self.album_list.copy()
+
+    def get_all_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         # 获取UP主的所有视频的数据
         if len(self.album_list) == 0:
             self.get_all_video_info()
@@ -210,10 +214,22 @@ class User:
         f.print_1('用户头像已保存')
 
         for album in self.album_list:
+            if album.aid in exclude_list:
+                continue
             album.get_album_data(cache_path, name_path, max_length)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
+
+    def get_all_video_av_list(self):
+        if len(self.album_list) == 0:
+            self.get_all_video_info()
+
+        av_list = []
+        for album in self.album_list:
+            av_list.append(album.aid)
+
+        return av_list
 
     def get_dict_info(self):
         json_data = vars(self).copy()
