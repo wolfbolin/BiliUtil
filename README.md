@@ -2,9 +2,14 @@
 
 # BiliUtil
 
-![Windows](https://img.shields.io/badge/Windows-support-green.svg)![Linux](https://img.shields.io/badge/Linux-test-orange.svg)![Python](https://img.shields.io/badge/Python-3.6-blue.svg)![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
+![Windows](https://img.shields.io/badge/Windows-support-green.svg)
+![Linux](https://img.shields.io/badge/Linux-testing-orange.svg)
+![Python](https://img.shields.io/badge/Python-3.6-blue.svg)
+![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
 
 Bilibili.com（B站）视频下载工具包
+
+Github源码地址：[https://github.com/wolfbolin/BiliUtil](https://github.com/wolfbolin/BiliUtil)
 
 **声明：该内容仅供学习参考，请勿用于商业目的**
 
@@ -96,7 +101,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-ua.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+ua.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -107,11 +112,16 @@ ua.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
 
 在设定用户uid信息后，即可通过该函数获取用户的基础信息。
 
+对返回值（副本）进行的修改不会影响User对象内的数据。
+
+**返回值**：字典数据（副本），用户基本信息
+
 ```python
 import BiliUtil
 if __name__ == '__main__':
 	ua = BiliUtil.User(uid='4093899')
-	ua.get_user_info()
+	user_info = ua.get_user_info()
+    print(user_info)
 ```
 
 
@@ -120,11 +130,15 @@ if __name__ == '__main__':
 
 你可以仅获取视频列表而不下载视频，该操作将自动帮你完成用户信息的获取。
 
+对返回值（副本）进行的修改不会影响User对象内的数据。
+
+**返回值**：Album对象列表（副本），用户发布的所有视频。
+
 ```python
 import BiliUtil
 if __name__ == '__main__':
 	ua = BiliUtil.User(uid='4093899')
-	ua.get_all_video_info()
+	all_video = ua.get_all_video_info()
 ```
 
 
@@ -148,11 +162,15 @@ if __name__ == '__main__':
 
 你可以仅获取频道列表而不下载视频，该操作将自动帮你完成用户信息的获取。
 
+对返回值（副本）进行的修改不会影响User对象内的数据。
+
+**返回值**：Channel对象列表（副本），用户的所有频道。
+
 ```python
 import BiliUtil
 if __name__ == '__main__':
 	ua = BiliUtil.User(uid='4093899')
-	ua.get_channel_video_info()
+	channel_list = ua.get_channel_video_info()
 ```
 
 
@@ -172,7 +190,25 @@ if __name__ == '__main__':
 
 
 
-#### 1.10、获取对象信息字典
+#### 1.10、获取所有视频AV号
+
+你可以获取用户发布的所有视频的AV号，该操作将自动帮你完成所有视频列表的获取。
+
+**返回值**：AV号列表，用户发布的所有视频的AV号（不包含前缀`av`）。
+
+```python
+import BiliUtil
+
+if __name__ == '__main__':
+    ua = BiliUtil.User()
+    ua.set_by_url('https://space.bilibili.com/6799052/')
+    av_list = ua.get_all_video_av_list()
+    print(av_list)
+```
+
+
+
+#### 1.11、获取对象信息字典
 
 你可以将当前对象中保存的所有信息转换为字典格式保存，修改该字典时并不会影响实例。
 
@@ -190,7 +226,7 @@ if __name__ == '__main__':
 
 
 
-#### 1.11、下载高清视频样例
+#### 1.12、下载高清视频样例
 
 ```python
 import BiliUtil
@@ -270,7 +306,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-ch.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+ch.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -281,11 +317,16 @@ ch.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
 
 你可以仅获取频道信息以及视频列表而不下载视频。
 
+对返回值（副本）进行的修改不会影响Channel对象内的数据。
+
+**返回值**：字典数据（副本），频道基本信息
+
 ```python
 import BiliUtil
 if __name__ == '__main__':
 	ch = BiliUtil.Channel(uid='4093899', cid='8020')
-	ch.get_channel_info()
+	channel_info = ch.get_channel_info()
+    print(channel_info)
 ```
 
 
@@ -305,7 +346,25 @@ if __name__ == '__main__':
 
 
 
-#### 2.7、获取对象信息字典
+#### 2.7、获取频道视频AV号
+
+你可以获取频道内所有视频的AV号，该操作将自动帮你完成频道信息的获取。
+
+**返回值**：AV号列表，频道内所有视频的AV号（不包含前缀`av`）。
+
+```python
+import BiliUtil
+
+if __name__ == '__main__':
+    ch = BiliUtil.Channel()
+    ch.set_by_url('https://space.bilibili.com/4282930/channel/detail?cid=48759')
+    av_list = ch.get_av_list()
+    print(av_list)
+```
+
+
+
+#### 2.8、获取对象信息字典
 
 你可以将当前对象中保存的所有信息转换为字典格式保存，修改该字典时并不会影响实例。
 
@@ -319,7 +378,7 @@ if __name__ == '__main__':
 
 
 
-#### 2.8、下载高清视频样例
+#### 2.9、下载高清视频样例
 
 ```python
 import BiliUtil
@@ -406,7 +465,7 @@ def set_by_url(self, url)
 设定的cookie信息会影响到该实例及其包含的所有自动创建的对象。
 
 ```python
-av.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
+av.set_cookie('SESSDATA=abcd68fd%2C1123761144%2C38d97xyz')
 ```
 
 **注**：cookie设置的方式与意义详见第三章的解释。
@@ -417,11 +476,16 @@ av.set_cookie('SESSDATA=abcd68fd%2C1551761144%2C38d97xyz')
 
 你可以仅获取专辑信息以及视频列表而不下载视频。
 
+对返回值（副本）进行的修改不会影响Album对象内的数据。
+
+**返回值**：字典数据（副本），频道基本信息
+
 ```python
 import BiliUtil
 if __name__ == '__main__':
 	av = BiliUtil.Album(aid='31483746')
-	av.get_album_info()
+	album_info = av.get_album_info()
+    print(album_info)
 ```
 
 
@@ -537,7 +601,7 @@ if __name__ == '__main__':
 - 通过cookie信息，你可以在下载视频的时候获取到更高清的视频数据，程序会根据你的身份（未登录、已登录、大会员），自动尝试并下载画质最好的视频（手动设置画质的功能写了一半没写完）。
 - 当对象设置了cookie信息后，程序会将该信息分发至该实例所包含的所有Album和Video对象中。声明新的对象以及对象的其他实例不受该操作的影响。
 
-* 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1551761144%2C38d97xyz`的cookie信息也是可以被识别的。也可以传入字典类型的cookie信息，但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
+* 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1123761144%2C38d97xyz`的cookie信息也是可以被识别的。也可以传入字典类型的cookie信息，但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
 * 不同的身份信息可下载视频的映射表：
   * 未登录--->480P
   * 已登录--->1080P
@@ -594,6 +658,14 @@ if __name__ == '__main__':
 
 
 ## 四、<span id="changelog">更新日志</span>
+
+### v0.1.5
+
+修改
+
+* 为频道与用户对象添加获取AV号列表函数。
+* 允许在批量下载视频时，通过添加排除列表，过滤部分视频的下载。
+* 为多个函数添加合适的响应值。
 
 ### v0.1.4
 

@@ -96,7 +96,7 @@ class Album:
             cv.set_cookie(self.cookie)
             self.video_list.append(cv)
 
-        return self
+        return vars(self).copy()
 
     def get_album_data(self, base_path='', name_path=False, max_length=None):
         if len(self.video_list) == 0:

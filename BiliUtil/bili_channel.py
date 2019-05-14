@@ -79,8 +79,9 @@ class Channel:
                 break
             else:
                 param['pn'] += 1
+        return vars(self).copy()
 
-    def get_channel_data(self, base_path='', name_path=False, max_length=None):
+    def get_channel_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         if len(self.album_list) == 0:
             self.get_channel_info()
 
@@ -105,10 +106,22 @@ class Channel:
         f.print_1('视频封面已保存')
 
         for album in self.album_list:
+            if album.aid in exclude_list:
+                continue
             album.get_album_data(cache_path, name_path, max_length)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
+
+    def get_av_list(self):
+        if len(self.album_list) == 0:
+            self.get_channel_info()
+
+        av_list = []
+        for album in self.album_list:
+            av_list.append(album.aid)
+
+        return av_list
 
     def get_dict_info(self):
         json_data = vars(self).copy()
