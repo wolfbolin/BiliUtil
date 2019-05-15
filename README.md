@@ -7,9 +7,9 @@
 ![Python](https://img.shields.io/badge/Python-3.6-blue.svg)
 ![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
 
-Bilibili.com（B站）视频下载工具包
+Bilibili.com（B站）视频下载工具包，Github源码地址：[https://github.com/wolfbolin/BiliUtil](https://github.com/wolfbolin/BiliUtil)
 
-Github源码地址：[https://github.com/wolfbolin/BiliUtil](https://github.com/wolfbolin/BiliUtil)
+若您在使用过程中发现BUG，请及时提交Issue或邮件（mailto@wolfbolin.com）与我联系。
 
 **声明：该内容仅供学习参考，请勿用于商业目的**
 
