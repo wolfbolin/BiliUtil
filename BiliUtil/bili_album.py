@@ -128,6 +128,27 @@ class Album:
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
 
+    def is_exist(self, base_path='', name_path=False):
+        if self.aid is None:
+            raise BaseException('缺少必要的参数')
+        if self.name is None:
+            self.get_album_info()
+
+        base_path = os.path.abspath(base_path)  # 获取绝对路径地址
+        if name_path:
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            if len(temp_name) == 0:
+                temp_name = self.aid
+            cache_path = base_path + '/{}'.format(temp_name)
+        else:
+            cache_path = base_path + '/{}'.format(self.aid)
+
+        if os.path.exists(cache_path):
+            return True
+        else:
+            return False
+
     def get_dict_info(self):
         json_data = vars(self).copy()
         video_list = []

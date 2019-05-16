@@ -119,7 +119,6 @@ class User:
         return self.channel_list.copy()
 
     def get_channel_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
-        # 获取UP主的所有视频的数据
         if len(self.channel_list) == 0:
             self.get_channel_video_info()
 
@@ -148,6 +147,28 @@ class User:
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
+
+    def get_channel_exist_list(self, base_path='', name_path=False):
+        if len(self.channel_list) == 0:
+            self.get_channel_video_info()
+
+        base_path = os.path.abspath(base_path)  # 获取绝对路径地址
+        if name_path:
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            if len(temp_name) == 0:
+                temp_name = self.uid
+            cache_path = base_path + '/{}'.format(temp_name)
+        else:
+            cache_path = base_path + '/{}'.format(self.uid)
+        if not os.path.exists(cache_path):
+            return []
+
+        exist_list = []
+        for channel in self.channel_list:
+            exist_list.extend(channel.get_exist_list(cache_path, name_path))
+
+        return exist_list
 
     def get_all_video_info(self):
         # 获取UP主的所有视频的列表信息
@@ -190,7 +211,6 @@ class User:
         return self.album_list.copy()
 
     def get_all_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
-        # 获取UP主的所有视频的数据
         if len(self.album_list) == 0:
             self.get_all_video_info()
 
@@ -214,12 +234,36 @@ class User:
         f.print_1('用户头像已保存')
 
         for album in self.album_list:
-            if album.aid in exclude_list:
+            if exclude_list is not None and album.aid in exclude_list:
                 continue
             album.get_album_data(cache_path, name_path, max_length)
 
         with open(cache_path + '/info.json', 'w', encoding='utf8') as file:
             file.write(str(json.dumps(self.get_dict_info())))
+
+    def get_all_video_exist_list(self, base_path='', name_path=False):
+        if len(self.album_list) == 0:
+            self.get_all_video_info()
+
+        base_path = os.path.abspath(base_path)  # 获取绝对路径地址
+        if name_path:
+            # 检查路径名中的特殊字符
+            temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
+            if len(temp_name) == 0:
+                temp_name = self.cid
+            cache_path = base_path + '/{}'.format(temp_name)
+        else:
+            cache_path = base_path + '/{}'.format(self.cid)
+
+        if not os.path.exists(cache_path):
+            return []
+
+        exist_list = []
+        for album in self.album_list:
+            if album.is_exist(cache_path, name_path):
+                exist_list.append(album.aid)
+
+        return exist_list
 
     def get_all_video_av_list(self):
         if len(self.album_list) == 0:

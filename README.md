@@ -13,7 +13,9 @@ Bilibili.com（B站）视频下载工具包，Github源码地址：[https://gith
 
 **声明：该内容仅供学习参考，请勿用于商业目的**
 
-*帮助信息请看到[第三章](#help)，更新日志请看到[第四章](#changelog)*
+*帮助信息请看到[帮助信息](#三、帮助信息)，更新日志请看到[更新日志](#四、更新日志)*
+
+[TOC]
 
 ## 一、安装方式
 
@@ -158,39 +160,27 @@ if __name__ == '__main__':
 
 
 
-#### 1.8、获取频道列表
+#### 1.8、获取已下载的视频
 
-你可以仅获取频道列表而不下载视频，该操作将自动帮你完成用户信息的获取。
+你可以通过该函数获取通过`get_all_video_data()`下载的视频的AV号列表，由于该函数的工作方式与缓存目录的结构息息相关，因此函数的参数应与get_all_video_data函数参数保持一致。
 
-对返回值（副本）进行的修改不会影响User对象内的数据。
-
-**返回值**：Channel对象列表（副本），用户的所有频道。
+**返回值**：AV号列表，用户发布的所有视频的AV号（不包含前缀`av`）。
 
 ```python
 import BiliUtil
+
 if __name__ == '__main__':
-	ua = BiliUtil.User(uid='4093899')
-	channel_list = ua.get_channel_video_info()
-```
-
-
-
-#### 1.9、获取频道视频数据
-
-你可以直接下载UP主的全部视频，该操作将自动帮你完成**用户信息**的获取与**频道列表**的获取。该操作支持**设定路径、命名方式、视频时长**，当设置了适合的cookie时，下载的画质将会自动提升。
-
-```python
-import BiliUtil
-if __name__ == '__main__':
-	ua = BiliUtil.User(uid='4093899')
-	ua.get_channel_video_data(base_path='Download', name_path=True, max_length=None)
+    ua = BiliUtil.User()
+    ua.set_by_url('https://space.bilibili.com/6799052/')
+    exist_list = ua.get_channel_exist_list(base_path='Download', name_path=True)
+    print(exist_list)
 ```
 
 **注**：参数设置的方式与意义详见第三章的解释。
 
 
 
-#### 1.10、获取所有视频AV号
+#### 1.9、获取所有视频AV号
 
 你可以获取用户发布的所有视频的AV号，该操作将自动帮你完成所有视频列表的获取。
 
@@ -208,7 +198,59 @@ if __name__ == '__main__':
 
 
 
-#### 1.11、获取对象信息字典
+#### 1.10、获取用户频道列表
+
+你可以仅获取频道列表而不下载视频，该操作将自动帮你完成用户信息的获取。
+
+对返回值（副本）进行的修改不会影响User对象内的数据。
+
+**返回值**：Channel对象列表（副本），用户的所有频道。
+
+```python
+import BiliUtil
+if __name__ == '__main__':
+	ua = BiliUtil.User(uid='4093899')
+	channel_list = ua.get_channel_video_info()
+```
+
+
+
+#### 1.11、获取频道视频数据
+
+你可以直接下载UP主的全部视频，该操作将自动帮你完成**用户信息**的获取与**频道列表**的获取。该操作支持**设定路径、命名方式、视频时长**，当设置了适合的cookie时，下载的画质将会自动提升。
+
+```python
+import BiliUtil
+if __name__ == '__main__':
+	ua = BiliUtil.User(uid='4093899')
+	ua.get_channel_video_data(base_path='Download', name_path=True, max_length=None)
+```
+
+**注**：参数设置的方式与意义详见第三章的解释。
+
+
+
+#### 1.12、获取已下载的视频
+
+你可以通过该函数获取通过`get_channel_video_data()`下载的视频的AV号列表，由于该函数的工作方式与缓存目录的结构息息相关，因此函数的参数应与get_channel_video_data函数参数保持一致。
+
+**返回值**：AV号列表，用户发布的所有视频的AV号（不包含前缀`av`）。
+
+```python
+import BiliUtil
+
+if __name__ == '__main__':
+    ua = BiliUtil.User()
+    ua.set_by_url('https://space.bilibili.com/6799052/')
+    exist_list = ua.get_channel_exist_list(base_path='Download', name_path=True)
+    print(exist_list)
+```
+
+**注**：参数设置的方式与意义详见第三章的解释。
+
+
+
+#### 1.13、获取对象信息字典
 
 你可以将当前对象中保存的所有信息转换为字典格式保存，修改该字典时并不会影响实例。
 
@@ -226,7 +268,7 @@ if __name__ == '__main__':
 
 
 
-#### 1.12、下载高清视频样例
+#### 1.14、下载高清视频样例
 
 ```python
 import BiliUtil
@@ -346,7 +388,26 @@ if __name__ == '__main__':
 
 
 
-#### 2.7、获取频道视频AV号
+#### 2.7、获取已下载的视频
+
+你可以通过该函数获取通过`get_channel_data()`下载的视频的AV号列表，由于该函数的工作方式与缓存目录的结构息息相关，因此函数的参数应与get_channel_data函数参数保持一致。
+
+**返回值**：AV号列表，用户发布的所有视频的AV号（不包含前缀`av`）。
+
+```python
+import BiliUtil
+
+if __name__ == '__main__':
+    ch = BiliUtil.Channel(uid='4093899', cid='8020')
+    exist_list = ch.get_channel_data(base_path='Download', name_path=True)
+    print(exist_list)
+```
+
+**注**：参数设置的方式与意义详见第三章的解释。
+
+
+
+#### 2.8、获取频道视频AV号
 
 你可以获取频道内所有视频的AV号，该操作将自动帮你完成频道信息的获取。
 
@@ -364,7 +425,7 @@ if __name__ == '__main__':
 
 
 
-#### 2.8、获取对象信息字典
+#### 2.9、获取对象信息字典
 
 你可以将当前对象中保存的所有信息转换为字典格式保存，修改该字典时并不会影响实例。
 
@@ -378,7 +439,7 @@ if __name__ == '__main__':
 
 
 
-#### 2.9、下载高清视频样例
+#### 2.10、下载高清视频样例
 
 ```python
 import BiliUtil
@@ -505,6 +566,24 @@ if __name__ == '__main__':
 
 
 
+#### 3.7、查询视频是否已下载
+
+你可以判断视频是否已经通过`get_album_data()`函数下载。由于该函数的工作方式与缓存目录的结构息息相关，因此函数的参数应与get_album_data函数参数保持一致。
+
+**返回值**：AV号列表，用户发布的所有视频的AV号（不包含前缀`av`）。
+
+```python
+import BiliUtil
+if __name__ == '__main__':
+    av = BiliUtil.Album(aid='31483746')
+    exist = av.is_exist(base_path='Download', name_path=True)
+    print(exist)
+```
+
+**注**：参数设置的方式与意义详见第三章的解释。
+
+
+
 #### 3.7、获取对象信息字典
 
 你可以将当前对象中保存的所有信息转换为字典格式保存，修改该字典时并不会影响实例。
@@ -593,7 +672,7 @@ if __name__ == '__main__':
 
 
 
-## 三、<span id="help">帮助信息</span>
+## 三、帮助信息
 
 ### 1、cookie信息
 
@@ -657,11 +736,22 @@ if __name__ == '__main__':
 
 
 
-## 四、<span id="changelog">更新日志</span>
+## 四、更新日志
+
+### v0.1.6
+
+修复
+
+* 修复exclude_list列表使用BUG
+
+新增
+
+* 为频道与用户对象添加获取已下载视频的AV号列表。
+* 为专辑对象添加判断视频是否已下载的访问接口
 
 ### v0.1.5
 
-修改
+新增
 
 * 为频道与用户对象添加获取AV号列表函数。
 * 允许在批量下载视频时，通过添加排除列表，过滤部分视频的下载。
