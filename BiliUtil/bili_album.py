@@ -1,5 +1,6 @@
 import os
 import re
+import copy
 import json
 import requests
 from urllib import parse
@@ -29,7 +30,7 @@ class Album:
     video_list = list()
 
     def __init__(self, aid=None):
-        self.aid = aid
+        self.set_album(aid)
 
     def set_album(self, aid=None):
         self.aid = aid
@@ -96,7 +97,7 @@ class Album:
             cv.set_cookie(self.cookie)
             self.video_list.append(cv)
 
-        return vars(self).copy()
+        return copy.deepcopy(vars(self))
 
     def get_album_data(self, base_path='', name_path=False, max_length=None):
         if len(self.video_list) == 0:
@@ -150,7 +151,7 @@ class Album:
             return False
 
     def get_dict_info(self):
-        json_data = vars(self).copy()
+        json_data = copy.deepcopy(vars(self))
         video_list = []
         if 'video_list' in json_data:
             for video in json_data['video_list']:

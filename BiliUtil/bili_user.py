@@ -1,5 +1,6 @@
 import os
 import re
+import copy
 import json
 import requests
 from urllib import parse
@@ -28,7 +29,7 @@ class User:
     channel_list = list()
 
     def __init__(self, uid=None):
-        self.uid = uid
+        self.set_user(uid)
 
     def set_user(self, uid):
         self.uid = uid
@@ -85,7 +86,7 @@ class User:
         self.sex = json_data['data']['sex']
         self.sign = json_data['data']['sign']
 
-        return vars(self).copy()
+        return copy.deepcopy(vars(self))
 
     def get_channel_video_info(self):
         # 获取UP所有频道的所有视频
@@ -116,7 +117,7 @@ class User:
             ch.set_cookie(self.cookie)
             self.channel_list.append(ch)
 
-        return self.channel_list.copy()
+        return copy.deepcopy(self.channel_list)
 
     def get_channel_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         if len(self.channel_list) == 0:
@@ -208,7 +209,7 @@ class User:
             else:
                 param['pn'] += 1
 
-        return self.album_list.copy()
+        return copy.deepcopy(self.album_list)
 
     def get_all_video_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         if len(self.album_list) == 0:
@@ -276,7 +277,7 @@ class User:
         return av_list
 
     def get_dict_info(self):
-        json_data = vars(self).copy()
+        json_data = copy.deepcopy(vars(self))
 
         album_list = []
         for album in self.album_list:

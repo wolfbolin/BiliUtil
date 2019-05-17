@@ -1,5 +1,6 @@
 import os
 import re
+import copy
 import json
 import requests
 from urllib import parse
@@ -79,7 +80,7 @@ class Channel:
                 break
             else:
                 param['pn'] += 1
-        return vars(self).copy()
+        return copy.deepcopy(vars(self))
 
     def get_channel_data(self, base_path='', name_path=False, max_length=None, exclude_list=None):
         if len(self.album_list) == 0:
@@ -147,7 +148,7 @@ class Channel:
         return av_list
 
     def get_dict_info(self):
-        json_data = vars(self).copy()
+        json_data = copy.deepcopy(vars(self))
 
         album_list = []
         for album in self.album_list:

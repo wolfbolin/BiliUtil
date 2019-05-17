@@ -1,5 +1,6 @@
 import os
 import re
+import copy
 import json
 import requests
 import subprocess
@@ -23,10 +24,7 @@ class Video:
     audio = None
 
     def __init__(self, aid=None, cid=None, index=None, name=None):
-        self.aid = aid
-        self.cid = cid
-        self.index = index
-        self.name = name
+        self.set_video(aid, cid, index, name)
 
     def set_video(self, aid=None, cid=None, index=None, name=None):
         self.aid = aid
@@ -151,5 +149,5 @@ class Video:
             raise BaseException('av:{},cv:{},下载失败'.format(self.aid, self.cid))
 
     def get_dict_info(self):
-        json_data = vars(self).copy()
+        json_data = copy.deepcopy(vars(self))
         return json_data
