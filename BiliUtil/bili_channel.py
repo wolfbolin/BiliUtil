@@ -148,8 +148,9 @@ class Channel:
 
     def get_dict_info(self):
         json_data = vars(self).copy()
+
         album_list = []
-        for album in json_data['album_list']:
+        for album in self.album_list:
             album_list.append(album.get_dict_info())
         json_data['album_list'] = album_list
         return json_data

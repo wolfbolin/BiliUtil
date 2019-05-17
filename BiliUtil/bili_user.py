@@ -279,12 +279,12 @@ class User:
         json_data = vars(self).copy()
 
         album_list = []
-        for album in json_data['album_list']:
+        for album in self.album_list:
             album_list.append(album.get_dict_info())
         json_data['album_list'] = album_list
 
         channel_list = []
-        for channel in json_data['channel_list']:
+        for channel in self.channel_list:
             channel_list.append(channel.get_dict_info())
         json_data['channel_list'] = channel_list
 

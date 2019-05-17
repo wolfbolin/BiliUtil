@@ -1,5 +1,6 @@
 import os
 import re
+
 _aria2c_result = os.popen('aria2c -v').read()
 _aria2c_result = re.match(r'(\S+)', _aria2c_result)
 if _aria2c_result is not None and _aria2c_result.group(1) == 'aria2':
