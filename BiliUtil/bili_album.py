@@ -132,7 +132,7 @@ class Album:
     def is_exist(self, base_path='', name_path=False):
         if self.aid is None:
             raise BaseException('缺少必要的参数')
-        if self.name is None:
+        if name_path and self.name is None:
             self.get_album_info()
 
         base_path = os.path.abspath(base_path)  # 获取绝对路径地址

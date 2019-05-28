@@ -246,6 +246,9 @@ class User:
         if len(self.album_list) == 0:
             self.get_all_video_info()
 
+        if name_path and self.name is None:
+            self.get_user_info()
+
         base_path = os.path.abspath(base_path)  # 获取绝对路径地址
         if name_path:
             # 检查路径名中的特殊字符
