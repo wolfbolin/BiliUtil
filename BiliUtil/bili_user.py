@@ -220,9 +220,9 @@ class User:
             temp_name = re.sub(r"[\/\\\:\*\?\"\<\>\|\s'‘’]", '_', self.name)
             if len(temp_name) == 0:
                 temp_name = self.uid
-            cache_path = base_path + './{}'.format(temp_name)
+            cache_path = base_path + '/{}'.format(temp_name)
         else:
-            cache_path = base_path + './{}'.format(self.uid)
+            cache_path = base_path + '/{}'.format(self.uid)
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
 
