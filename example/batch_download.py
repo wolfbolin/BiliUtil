@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
 # Common package
+import os
 import BiliUtil
 # Personal package
 
 # Config setting
 name_path = True
 user_list = {
-    '89916351': '半柠檬',
-    '4684911': '凳猫猫',
-    '303153314': '糖果机长',
     '6799052': '泡芙酱',
     '4282930': '豆豆子',
-    '8366990': '欣小萌',
-    '17894575': '甲戌',
-    '84465926': '小金鱼',
-    '1600113': '萌爱',
-    '4796303': '仙蛋'
+    '8366990': '欣小萌'
 }
 channel_list = []
 exclude_list = []
 video_cache = r'/home/bilibili'
 cookie = "SESSDATA=123123"
+
 
 def open_dir(path):
     path = os.path.abspath(path)
@@ -32,6 +27,7 @@ def open_dir(path):
         file_path = path + '\\' + file
         if os.path.isdir(file_path):
             open_dir(file_path)
+
 
 if __name__ == '__main__':
     # 扫描指定用户并下载

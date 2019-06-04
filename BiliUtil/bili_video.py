@@ -133,7 +133,7 @@ class Video:
         referer = 'https://www.bilibili.com/video/av' + str(self.aid)
         shell = 'aria2c -c -s 1 -d "{}" -o "{}" --referer="{}" "{}"'
         shell = shell.format(cache_path, file_name, referer, download_url)
-        process = subprocess.Popen(shell)
+        process = subprocess.Popen(shell, shell=True)
         process.wait()
 
         file_path = '{}/{}'.format(cache_path, file_name)
