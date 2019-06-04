@@ -204,10 +204,10 @@ class User:
                 self.album_list.append(av)
 
             # 循环翻页获取并自动退出循环
-            if len(self.album_list) >= int(json_data['data']['pages']):
+            if len(self.album_list) >= int(json_data['data']['count']):
                 break
             else:
-                param['pn'] += 1
+                param['page'] += 1
 
         return copy.deepcopy(self.album_list)
 
