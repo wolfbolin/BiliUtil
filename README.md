@@ -9,7 +9,7 @@
 
 Bilibili.com（B站）视频下载工具包，Github源码地址：[https://github.com/wolfbolin/BiliUtil](https://github.com/wolfbolin/BiliUtil)
 
-若您在使用过程中发现BUG，请及时提交Issue或邮件（mailto@wolfbolin.com）与我联系。
+若您在使用过程中发现BUG或有可以改进之处，欢迎提交Issue或邮件（mailto@wolfbolin.com）与我联系。如果绝对还不错，欢迎Star和Fork支持一下。
 
 **声明：该内容仅供学习参 考，请勿用于商业目的**
 
