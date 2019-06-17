@@ -58,7 +58,7 @@ class Album:
         for video in self.video_list:
             video.set_cookie(cookie)
 
-    def get_album_info(self):
+    def get_album_info(self, proxies=None):
         if self.aid is None:
             raise BaseException('缺少必要的参数')
 
@@ -66,15 +66,17 @@ class Album:
         param = {
             'aid': str(self.aid)
         }
-        http_result = requests.get(v.URL_UP_ALBUM, params=param,
+        http_result = requests.get(v.URL_UP_ALBUM, params=param, proxies=proxies,
                                    headers=f.new_http_header(v.URL_UP_ALBUM))
         if http_result.status_code == 200:
             f.print_g('OK {}'.format(http_result.status_code))
         else:
             f.print_r('RE {}'.format(http_result.status_code))
         json_data = json.loads(http_result.text)
-        if json_data['code'] != 0:
-            raise BaseException('获取数据的过程发生错误')
+        if json_data['code'] == -404 or json_data['code'] == -403:
+            raise LookupError('稿件av{}异常或被锁定，无法下载'.format(self.aid))
+        elif json_data['code'] != 0:
+            raise BaseException('获取数据的过程发生错误:av={},code={}'.format(self.aid, json_data['code']))
 
         # 修改对象信息
         self.aid = json_data['data']['aid']
@@ -101,7 +103,11 @@ class Album:
 
     def get_album_data(self, base_path='', name_path=False, max_length=None):
         if len(self.video_list) == 0:
-            self.get_album_info()
+            try:
+                self.get_album_info()
+            except LookupError as e:
+                f.print_r('{}，已跳过'.format(e))
+                return
 
         base_path = os.path.abspath(base_path)  # 获取绝对路径地址
         if name_path:
@@ -133,7 +139,11 @@ class Album:
         if self.aid is None:
             raise BaseException('缺少必要的参数')
         if name_path and self.name is None:
-            self.get_album_info()
+            try:
+                self.get_album_info()
+            except LookupError as e:
+                f.print_r('{}，已跳过'.format(e))
+                return False
 
         base_path = os.path.abspath(base_path)  # 获取绝对路径地址
         if name_path:

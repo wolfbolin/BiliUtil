@@ -1,9 +1,10 @@
 HTTP_HEADER = {
     'Host': '',
     'Connection': 'keep-alive',
-    'Accept': 'application/json, text/plain, */*',
+    'Accept': '*/*',
     'User-Agent': '',
-    'Referer': 'https://www.bilibili.com',
+    'Origin': 'https://www.bilibili.com',
+    'Referer': '',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7'
 }

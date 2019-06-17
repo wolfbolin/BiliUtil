@@ -39,10 +39,11 @@ def print_gray(message, end='\n'):
     print('\033[0;37;0m{}\033[0m'.format(str(message)), end=end)
 
 
-def new_http_header(url):
+def new_http_header(url, ref='https://www.bilibili.com'):
     header = v.HTTP_HEADER.copy()
     header['Host'] = parse.urlparse(url).netloc
     header['User-Agent'] = UserAgent().random
+    header['Referer'] = ref
     return header
 
 
@@ -61,7 +62,8 @@ def merge_video_file(path, delete=False):
                     shell = 'ffmpeg -i "{}.flv" -i "{}.aac" -c copy -f mp4 -y "{}.mp4"'
                     process = subprocess.Popen(shell.format(prefix, prefix, prefix),
                                                stdout=subprocess.PIPE,
-                                               stderr=subprocess.PIPE)
+                                               stderr=subprocess.PIPE,
+                                               shell=True)
                     process.communicate()
                     if os.path.exists(prefix + '.mp4'):
                         print_1('视频', end='')

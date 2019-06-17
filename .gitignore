@@ -2,6 +2,7 @@
 .idea
 test.py
 pip_upload.txt
+MEMOBIRD.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

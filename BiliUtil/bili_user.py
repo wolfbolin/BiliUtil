@@ -235,7 +235,7 @@ class User:
         f.print_1('用户头像已保存')
 
         for album in self.album_list:
-            if exclude_list is not None and album.aid in exclude_list:
+            if exclude_list is not None and int(album.aid) in exclude_list:
                 continue
             album.get_album_data(cache_path, name_path, max_length)
 
