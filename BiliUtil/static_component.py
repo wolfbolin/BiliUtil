@@ -33,7 +33,7 @@ class Downloader:
     SET_AS_CODE = 2
 
     class Filter:
-        def __init__(self, page, quality, length, height, width):
+        def __init__(self, quality=None, length=None, height=None, width=None, page=None):
             self.quality = quality
             self.length = length
             self.height = height
@@ -67,13 +67,14 @@ class Downloader:
 
         def check_video(self, video):
             if self.quality and video.quality in self.quality:
+                print(video.quality)
                 return False
-            if self.length and self.length[0] <= video.length <= video.length[1]:
+            if self.length and self.length[0] <= video.length <= self.length[1]:
                 return False
             if video.level == 'new_version':
-                if self.height and self.height[0] <= video.height <= video.height[1]:
+                if self.height and self.height[0] <= video.height <= self.height[1]:
                     return False
-                if self.width and self.width[0] <= video.width <= video.width[1]:
+                if self.width and self.width[0] <= video.width <= self.width[1]:
                     return False
             if self.page and video.page in self.page:
                 return False
@@ -90,9 +91,9 @@ class Downloader:
             self.audio = video.audio
             self.path = os.path.abspath(output)
             if name_pattern == Downloader.SET_AS_NAME:
-                self.name = '{} P{} {}'.format(Util.legalize_name(video.name), video.page + 1, video.quality[1])
+                self.name = '{}_P{}_{}'.format(Util.legalize_name(video.name), video.page, video.quality[1])
             elif name_pattern == Downloader.SET_AS_CODE:
-                self.name = video.cid
+                self.name = '{}_P{}_{}'.format(video.cid, video.page, video.quality[1])
             else:
                 raise ParameterError('参数类型异常')
 
@@ -106,7 +107,7 @@ class Downloader:
 
 class AutoLoad:
     @staticmethod
-    def user_all_video(user, v_filter, cookie, output, name_pattern):
+    def user_all_video(user, output, name_pattern, v_filter=None, cookie=None):
         absolute_path = os.path.abspath(output)
         user_structure = {
             'type': 'user',
@@ -126,13 +127,11 @@ class AutoLoad:
                 'type': 'album',
                 'path': album_path,
                 'name': album.aid,
-                'task_list': []
+                'sublayer': []
             }
             if name_pattern == Downloader.SET_AS_NAME:
                 album.sync()
                 album_structure['name'] = Util.legalize_name(album.name)
-
-            print(json.dumps(album_structure, ensure_ascii=False))
 
             video_list = album.get_video_list()
             video_path = '{}/{}'.format(album_structure['path'], album_structure['name'])
@@ -142,8 +141,7 @@ class AutoLoad:
                 if v_filter and v_filter.check_video(video):
                     continue
                 task = Downloader.Task(video, video_path, name_pattern)
-                # album_structure['task_list'].append(task)
-                album_structure['task_list'].append(copy.deepcopy(vars(task)))
+                album_structure['task_list'].append(task)
 
             if len(album_structure['task_list']) > 0:
                 user_structure['sublayer'].append(album_structure)
@@ -176,8 +174,6 @@ class AutoLoad:
             if name_pattern == Downloader.SET_AS_NAME:
                 album.sync()
                 album_structure['name'] = Util.legalize_name(album.name)
-
-            print(json.dumps(album_structure, ensure_ascii=False))
 
             video_list = album.get_video_list()
             video_path = '{}/{}'.format(album_structure['path'], album_structure['name'])

@@ -74,19 +74,12 @@ class Album:
         if self.aid is None:
             raise ParameterError('缺少获取视频信息的必要参数')
 
-        # 发送网络请求
-        http_request = {
-            'info_obj': Util.ALBUM,
-            'params': {
-                'aid': str(self.aid)
-            },
-            'cookie': cookie
-        }
-        json_data = Util.http_get(**http_request)
+        if self.cid_list is None:
+            self.sync(cookie)
 
         video_list = []
-        for index, page in enumerate(json_data['data']['pages']):
-            cv = Video(self.aid, page['cid'], self.name, index)
+        for index, cid in enumerate(self.cid_list):
+            cv = Video(self.aid, cid, self.name, index+1)
             video_list.append(cv)
 
         return video_list
