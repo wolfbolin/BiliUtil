@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import re
+import sys
 import copy
 import time
 import json
@@ -97,21 +98,49 @@ class Downloader:
             else:
                 raise ParameterError('参数类型异常')
 
-        def start(self):
+        def start(self, show_process=True, no_repeat=True):
+            if no_repeat and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name))):
+                return
             if self.level == 'old_version':
-                Util.aria2c(self.aid, self.path, self.name + '.mp4', self.video)
+                Util.aria2c(self.aid, self.path, self.name + '.mp4', self.video, show_process)
             elif self.level == 'new_version':
-                Util.aria2c(self.aid, self.path, self.name + '.acc', self.audio)
-                Util.aria2c(self.aid, self.path, self.name + '.flv', self.video)
+                Util.aria2c(self.aid, self.path, self.name + '.aac', self.audio, show_process)
+                Util.aria2c(self.aid, self.path, self.name + '.flv', self.video, show_process)
+                Util.ffmpeg(self.path, self.name, show_process)
+                sys.stdout.flush()
 
 
 class AutoLoad:
+    @staticmethod
+    def exist_list(structure):
+        if structure['type'] == 'album':
+            dir_path = os.path.abspath('{}/{}'.format(structure['path'], structure['name']))
+            if os.path.exists(dir_path):
+                return [structure['code']]
+            else:
+                return []
+        else:
+            album_list = []
+            for sub in structure['sublayer']:
+                album_list.extend(AutoLoad.exist_list(sub))
+            return album_list
+
+    @staticmethod
+    def auto_download(structure, show_process=True, no_repeat=True):
+        if structure['type'] == 'album':
+            for task in structure['sublayer']:
+                task.start(show_process, no_repeat)
+        else:
+            for sub in structure['sublayer']:
+                AutoLoad.auto_download(sub, show_process, no_repeat)
+
     @staticmethod
     def user_all_video(user, output, name_pattern, v_filter=None, cookie=None):
         absolute_path = os.path.abspath(output)
         user_structure = {
             'type': 'user',
             'path': absolute_path,
+            'code': user.uid,
             'name': user.uid,
             'sublayer': []
         }
@@ -126,6 +155,7 @@ class AutoLoad:
             album_structure = {
                 'type': 'album',
                 'path': album_path,
+                'code': album.aid,
                 'name': album.aid,
                 'sublayer': []
             }
@@ -141,9 +171,9 @@ class AutoLoad:
                 if v_filter and v_filter.check_video(video):
                     continue
                 task = Downloader.Task(video, video_path, name_pattern)
-                album_structure['task_list'].append(task)
+                album_structure['sublayer'].append(task)
 
-            if len(album_structure['task_list']) > 0:
+            if len(album_structure['sublayer']) > 0:
                 user_structure['sublayer'].append(album_structure)
 
         return user_structure
@@ -154,6 +184,7 @@ class AutoLoad:
         channel_structure = {
             'type': 'channel',
             'path': absolute_path,
+            'code': channel.cid,
             'name': channel.cid,
             'sublayer': []
         }
@@ -168,6 +199,7 @@ class AutoLoad:
             album_structure = {
                 'type': 'album',
                 'path': album_path,
+                'code': album.aid,
                 'name': album.aid,
                 'task_list': []
             }
@@ -183,10 +215,9 @@ class AutoLoad:
                 if v_filter and v_filter.check_video(video):
                     continue
                 task = Downloader.Task(video, video_path, name_pattern)
-                # album_structure['task_list'].append(task)
-                album_structure['task_list'].append(copy.deepcopy(vars(task)))
+                album_structure['sublayer'].append(task)
 
-            if len(album_structure['task_list']) > 0:
+            if len(album_structure['sublayer']) > 0:
                 channel_structure['sublayer'].append(album_structure)
 
         return channel_structure
@@ -247,11 +278,27 @@ class Util:
     def http_get(info_obj, params, cookie=None):
         http_header = Util.new_http_header(info_obj)
         if cookie is not None:
-            http_header['Cookie'] = cookie
+            if isinstance(cookie, dict):
+                cookie = {
+                    'SESSDATA': cookie['SESSDATA']
+                }
+            elif isinstance(cookie, str) and len(cookie) > 0:
+                for line in cookie.split(';'):
+                    name, value = line.strip().split('=', 1)
+                    if name == 'SESSDATA':
+                        cookie = {
+                            'SESSDATA': value
+                        }
+                        break
+            else:
+                cookie = dict()
+        else:
+            cookie = dict()
 
         for times in range(5):
             try:
-                http_result = requests.get(url=info_obj['url'], params=params, headers=http_header, timeout=5)
+                http_result = requests.get(url=info_obj['url'], params=params, cookies=cookie,
+                                           headers=http_header, timeout=5)
             except requests.exceptions:
                 time.sleep(3)
                 continue
@@ -279,14 +326,36 @@ class Util:
         return legal_name
 
     @staticmethod
-    def aria2c(aid, path, name, url_list):
+    def aria2c(aid, path, name, url_list, show_process=False):
+        if show_process:
+            out_pipe = None
+        else:
+            out_pipe = subprocess.PIPE
         referer = 'https://www.bilibili.com/video/av' + str(aid)
         url = '"{}"'.format('" "'.join(url_list))
         shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {}'
         shell = shell.format(len(url_list), path, name, referer, url)
-        print(shell)
-        process = subprocess.Popen(shell, shell=True)
+        process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
         process.wait()
+
+    @staticmethod
+    def ffmpeg(path, name, show_process=False):
+        if show_process:
+            out_pipe = None
+        else:
+            out_pipe = subprocess.PIPE
+        flv_file = os.path.abspath('{}/{}.flv'.format(path, name))
+        aac_file = os.path.abspath('{}/{}.aac'.format(path, name))
+        mp4_file = os.path.abspath('{}/{}.mp4'.format(path, name))
+        if os.path.exists(flv_file) and os.path.exists(aac_file):
+            shell = 'ffmpeg -i "{}" -i "{}" -c copy -f mp4 -y "{}"'
+            shell = shell.format(flv_file, aac_file, mp4_file)
+            process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
+            process.wait()
+            os.remove(flv_file)
+            os.remove(aac_file)
+        else:
+            raise RunningError('找不到下载的音视频文件')
 
 
 class ParameterError(Exception):
