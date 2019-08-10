@@ -2,15 +2,13 @@
 import re
 import copy
 from urllib import parse
-from BiliUtil.bilibili_video import Video
-from BiliUtil.static_component import Util
-from BiliUtil.static_component import ParameterError
-from BiliUtil.static_component import RunningError
+import BiliUtil.Util as Util
+import BiliUtil.Video as Video
 
 
 class Album:
     def __init__(self, aid=None):
-        self.aid = aid
+        self.aid = str(aid)
         self.num = None
         self.type = None
         self.cover = None
@@ -27,17 +25,17 @@ class Album:
         self.cid_list = list()
 
     def set_album(self, aid):
-        self.aid = aid
+        self.aid = str(aid)
 
     def set_by_url(self, url):
         input_url = parse.urlparse(url)
         aid = re.match('/video/av([0-9]+)', input_url.path).group(1)
-        self.aid = aid
+        self.aid = str(aid)
 
     def sync(self, cookie=None):
         # 检验必要的参数
         if self.aid is None:
-            raise ParameterError('缺少获取视频信息的必要参数')
+            raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         # 发送网络请求
         http_request = {
@@ -50,7 +48,6 @@ class Album:
         json_data = Util.http_get(**http_request)
 
         # 修改对象信息
-        self.aid = json_data['data']['aid']
         self.num = json_data['data']['videos']
         self.type = json_data['data']['tname']
         self.cover = json_data['data']['pic']
@@ -72,14 +69,14 @@ class Album:
     def get_video_list(self, cookie=None):
         # 检验必要的参数
         if self.aid is None:
-            raise ParameterError('缺少获取视频信息的必要参数')
+            raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         if self.cid_list is None:
             self.sync(cookie)
 
         video_list = []
         for index, cid in enumerate(self.cid_list):
-            cv = Video(self.aid, cid, self.name, index+1)
+            cv = Video.Video(self.aid, cid, self.name, index+1)
             video_list.append(cv)
 
         return video_list

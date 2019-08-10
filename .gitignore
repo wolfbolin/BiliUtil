@@ -1,8 +1,6 @@
 # For my self
 .idea
-verify.py
-fiddler/
-pip_upload.txt
+staging.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

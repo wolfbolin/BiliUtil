@@ -2,16 +2,14 @@
 import re
 import copy
 from urllib import parse
-from BiliUtil.bilibili_album import Album
-from BiliUtil.static_component import Util
-from BiliUtil.bilibili_channel import Channel
-from BiliUtil.static_component import ParameterError
-from BiliUtil.static_component import RunningError
+import BiliUtil.Util as Util
+import BiliUtil.Space as Space
+import BiliUtil.Video as Video
 
 
 class User:
     def __init__(self, uid=None):
-        self.uid = uid
+        self.uid = str(uid)
         self.name = None
         self.birthday = None
         self.title = None
@@ -23,17 +21,17 @@ class User:
         self.vip = None
 
     def set_user(self, uid):
-        self.uid = uid
+        self.uid = str(uid)
 
     def set_by_url(self, url):
         input_url = parse.urlparse(url)
         uid = re.match('/([0-9]+)', input_url.path).group(1)
-        self.uid = uid
+        self.uid = str(uid)
 
     def sync(self, cookie=None):
         # 检验必要的参数
         if self.uid is None:
-            raise ParameterError('缺少获取用户信息的必要参数')
+            raise Util.ParameterError('缺少获取用户信息的必要参数')
 
         # 发送网络请求
         http_request = {
@@ -47,7 +45,6 @@ class User:
         json_data = Util.http_get(**http_request)
 
         # 修改对象信息
-        self.uid = json_data['data']['mid']
         self.name = json_data['data']['name']
         self.sex = json_data['data']['sex']
         self.face = json_data['data']['face']
@@ -75,7 +72,7 @@ class User:
             'cookie': cookie
         }
         json_data = Util.http_get(**http_request)
-        channel_list = list(Channel(self.uid, ch['cid']) for ch in json_data['data']['list'])
+        channel_list = list(Space.Channel(self.uid, ch['cid']) for ch in json_data['data']['list'])
 
         # 返回频道列表
         return channel_list
@@ -83,7 +80,7 @@ class User:
     def get_album_list(self, cookie=None):
         # 检验必要的参数
         if self.uid is None:
-            raise ParameterError('缺少获取视频列表的必要参数')
+            raise Util.ParameterError('缺少获取视频列表的必要参数')
 
         # 发送网络请求
         http_request = {
@@ -102,7 +99,7 @@ class User:
             json_data = Util.http_get(**http_request)
 
             # 循环获取列表
-            album_list.extend([Album(av['aid']) for av in json_data['data']['vlist']])
+            album_list.extend([Video.Album(av['aid']) for av in json_data['data']['vlist']])
             if len(album_list) < int(json_data['data']['count']):
                 http_request['params']['page'] += 1
             else:
