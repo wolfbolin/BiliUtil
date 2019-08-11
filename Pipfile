@@ -4,10 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+requests = "*"
+fake-useragent = "*"
 
 [packages]
 requests = "==2.22.0"
-fake-useragent = "*"
+fake-useragent = "==0.1.11"
 
 [requires]
 python_version = "3.7"

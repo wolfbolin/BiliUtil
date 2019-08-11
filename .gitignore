@@ -1,8 +1,6 @@
 # For my self
 .idea
-test.py
-pip_upload.txt
-MEMOBIRD.py
+staging.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -95,3 +93,5 @@ ENV/
 .ropeproject
 *.npy
 *.pkl
+
+pip_upload\.txt
