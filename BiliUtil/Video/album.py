@@ -22,7 +22,7 @@ class Album:
         self.coin = None
         self.share = None
         self.like = None
-        self.cid_list = list()
+        self.cid_list = None
 
     def set_album(self, aid):
         self.aid = str(aid)

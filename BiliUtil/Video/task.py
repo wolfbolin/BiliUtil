@@ -7,7 +7,7 @@ import BiliUtil.Util as Util
 
 
 class Task:
-    def __init__(self, video, output, cover, name):
+    def __init__(self, video, output, name, cover=None):
         self.video_info = copy.deepcopy(vars(video))
         del self.video_info['video']
         del self.video_info['audio']
@@ -29,7 +29,7 @@ class Task:
         if not os.path.exists(self.path):
             os.makedirs(self.path)  # 创建基础路径
         # 保存视频封面
-        if not os.path.exists(self.path + '/cover.jpg'):
+        if self.cover is not None and not os.path.exists(self.path + '/cover.jpg'):
             proxies = {
                 'http': Util.Config.HTTP_PROXY,
                 'https': Util.Config.HTTPS_PROXY

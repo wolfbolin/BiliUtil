@@ -17,17 +17,17 @@ class Filter:
         self.quality = quality
 
     def set_length(self, length):
-        if ~isinstance(length, tuple):
+        if ~isinstance(length, list):
             raise Util.ParameterError('参数类型异常')
         self.length = length
 
     def set_height(self, height):
-        if ~isinstance(height, tuple):
+        if ~isinstance(height, list):
             raise Util.ParameterError('参数类型异常')
         self.height = height
 
     def set_width(self, width):
-        if ~isinstance(width, tuple):
+        if ~isinstance(width, list):
             raise Util.ParameterError('参数类型异常')
         self.width = width
 
@@ -37,7 +37,7 @@ class Filter:
         self.page = page
 
     def set_ratio(self, ratio):
-        if ~isinstance(ratio, tuple):
+        if ~isinstance(ratio, list):
             raise Util.ParameterError('参数类型异常')
         self.ratio = ratio
 

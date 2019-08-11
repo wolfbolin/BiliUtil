@@ -84,13 +84,13 @@ class Fetcher:
             # 执行过滤策略
             if info['album'].aid in exclude:
                 continue
-            elif v_filter.check_video(info['video']):
+            elif v_filter is not None and v_filter.check_video(info['video']):
                 continue
 
             # 创建新的下载任务
             full_path = '{}/{}/{}'.format(base_path, info['obj_name'], info['album_name'])
             self.task_list.append(Video.Task(info['video'], full_path,
-                                             info['album'].cover, info['video_name']))
+                                             info['video_name'], info['album'].cover))
             task_id.append(info['album'].aid)
 
         task_id = list(set(task_id))
