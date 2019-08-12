@@ -56,7 +56,7 @@ pip install BiliUtil
 
 获取视频信息并下载视频
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
     album = BiliUtil.Album(3947271)
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
 获取用户信息并下载所有视频
 
-```
+```python
 import BiliUtil
 if __name__ == '__main__':
     cookie = "SESSDATA=abcd68fd..."
