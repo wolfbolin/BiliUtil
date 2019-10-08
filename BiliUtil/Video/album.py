@@ -23,7 +23,7 @@ class Album:
         self.share = None
         self.like = None
         self.cid_list = None
-        self.page_list = None
+        self.title_list = None
 
     def set_album(self, aid):
         self.aid = str(aid)
@@ -63,7 +63,7 @@ class Album:
         self.share = json_data['data']['stat']['share']
         self.like = json_data['data']['stat']['like']
         self.cid_list = list(page['cid'] for page in json_data['data']['pages'])
-        self.page_list = list(page['part'] for page in json_data['data']['pages'])
+        self.title_list = list(page['part'] for page in json_data['data']['pages'])
 
         # 返回专辑信息
         return copy.deepcopy(vars(self))
