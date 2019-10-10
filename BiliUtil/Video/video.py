@@ -15,7 +15,7 @@ class Video:
         self.height = None
         self.width = None
         self.level = None
-        self.video = None
+        self.video = list()
         self.audio = None
 
     def sync(self, cookie=None, quality=None):
@@ -62,11 +62,12 @@ class Video:
 
         elif 'durl' in json_data['data']:
             self.level = 'old_version'
-            video_obj = json_data['data']['durl'][-1]
-            self.video = list([video_obj['url']])
-            if video_obj['backup_url']:
-                for backup in video_obj['backup_url']:
-                    self.video.append(backup)
+            video_obj_list = json_data['data']['durl']
+            for video_obj in video_obj_list:
+                self.video.append(video_obj['url'])
+                if video_obj['backup_url']:
+                    for backup in video_obj['backup_url']:
+                        self.video.append(backup)
 
         # 返回视频信息
         return copy.deepcopy(vars(self))

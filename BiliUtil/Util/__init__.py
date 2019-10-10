@@ -12,5 +12,6 @@ from .tools import http_get
 from .tools import legalize_name
 from .tools import aria2c_pull
 from .tools import ffmpeg_merge
+from .tools import ffmpeg_merge_old
 from .tools import ParameterError
 from .tools import RunningError

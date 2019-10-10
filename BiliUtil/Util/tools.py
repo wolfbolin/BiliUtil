@@ -164,7 +164,7 @@ def aria2c_pull(aid, path, name, url_list, show_process=False):
     proxies += ' --https-proxy="{}"'.format(Config.HTTPS_PROXY) if Config.HTTPS_PROXY is not None else ""
 
     referer = 'https://www.bilibili.com/video/av' + str(aid)
-    url = '"{}"'.format('" "'.join(url_list))
+    url = '"{}"'.format(' '.join(url_list))
     shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
     shell = shell.format(len(url_list), path, name, referer, proxies, url)
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
@@ -189,6 +189,32 @@ def ffmpeg_merge(path, name, show_process=False):
     else:
         raise RunningError('找不到下载的音视频文件')
 
+
+def ffmpeg_merge_old(path, name, video_num, show_process=False):
+    if show_process:
+        out_pipe = None
+    else:
+        out_pipe = subprocess.PIPE
+    flv_list = []
+    apath = os.path.abspath('{}/{}'.format(path, name))
+    txtpath = '{}.txt'.format(apath)
+    input_fd = os.open(txtpath, os.O_WRONLY)
+    for cnt in range(video_num):
+        current_flv = '{}.{}'.format(apath, str(cnt))
+        if os.path.exists(current_flv):
+            os.write(input_fd, str.encode('{}\n'.format(current_flv)))
+            flv_list.append('-i "{}"'.format(current_flv))
+        else:
+            raise RunningError('找不到视频分片:{}，合并取消'.format(current_flv))
+    os.close(input_fd)
+    #shell = 'ffmpeg -i "{}" -i "{}" -c copy -f mp4 -y "{}"'
+    shell = 'ffmpeg -f concat -safe 0 -i {} -c copy "{}"'
+    shell = shell.format(txtpath, '{}.mp4'.format(apath))
+    process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
+    process.wait()
+    os.remove(txtpath)
+    for cnt in range(video_num):
+        os.remove('{}.{}'.format(apath, str(cnt)))
 
 class ParameterError(Exception):
     def __init__(self, value):
