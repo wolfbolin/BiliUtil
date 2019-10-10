@@ -208,13 +208,16 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
             raise RunningError('找不到视频分片:{}，合并取消'.format(current_flv))
     os.close(input_fd)
     #shell = 'ffmpeg -i "{}" -i "{}" -c copy -f mp4 -y "{}"'
-    shell = 'ffmpeg -f concat -safe 0 -i {} -c copy "{}"'
+    shell = 'ffmpeg -f concat -safe 0 -i "{}" -c copy "{}"'
     shell = shell.format(txtpath, '{}.mp4'.format(apath))
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
-    os.remove(txtpath)
-    for cnt in range(video_num):
-        os.remove('{}.{}'.format(apath, str(cnt)))
+    if os.path.exists('{}.mp4'.format(apath)):
+        os.remove(txtpath)
+        for cnt in range(video_num):
+            os.remove('{}.{}'.format(apath, str(cnt)))
+    else:
+        raise RunningError('FFmpeg输出视频失败！')
 
 class ParameterError(Exception):
     def __init__(self, value):
