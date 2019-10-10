@@ -203,7 +203,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
     for cnt in range(video_num):
         current_flv = '{}.{}'.format(apath, str(cnt))
         if os.path.exists(current_flv):
-            os.write(input_fd, str.encode('file "{}"\n'.format(current_flv)))
+            os.write(input_fd, str.encode("file '{}'\n".format(current_flv)))
         else:
             raise RunningError('找不到视频分片:{}，合并取消'.format(current_flv))
     os.close(input_fd)
