@@ -195,29 +195,31 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
         out_pipe = None
     else:
         out_pipe = subprocess.PIPE
-    flv_list = []
     apath = os.path.abspath('{}/{}'.format(path, name))
     txtpath = '{}.txt'.format(apath)
+    outpath = '{}.mp4'.format(apath)
+
     input_fd = os.open(txtpath, os.O_WRONLY | os.O_CREAT)
     for cnt in range(video_num):
         current_flv = '{}.{}'.format(apath, str(cnt))
         if os.path.exists(current_flv):
-            os.write(input_fd, str.encode('{}\n'.format(current_flv)))
-            flv_list.append('-i "{}"'.format(current_flv))
+            os.write(input_fd, str.encode('file "{}"\n'.format(current_flv)))
         else:
             raise RunningError('找不到视频分片:{}，合并取消'.format(current_flv))
     os.close(input_fd)
-    #shell = 'ffmpeg -i "{}" -i "{}" -c copy -f mp4 -y "{}"'
-    shell = 'ffmpeg -f concat -safe 0 -i "{}" -c copy "{}"'
-    shell = shell.format(txtpath, '{}.mp4'.format(apath))
+
+    shell = r'ffmpeg -f concat -safe 0 -i "{}" -c copy "{}"'
+    shell = shell.format(txtpath, outpath)
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
-    if os.path.exists('{}.mp4'.format(apath)):
+
+    if os.path.exists(outpath):
         os.remove(txtpath)
         for cnt in range(video_num):
             os.remove('{}.{}'.format(apath, str(cnt)))
     else:
         raise RunningError('FFmpeg输出视频失败！')
+
 
 class ParameterError(Exception):
     def __init__(self, value):
