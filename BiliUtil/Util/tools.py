@@ -198,7 +198,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
     flv_list = []
     apath = os.path.abspath('{}/{}'.format(path, name))
     txtpath = '{}.txt'.format(apath)
-    input_fd = os.open(txtpath, os.O_WRONLY)
+    input_fd = os.open(txtpath, os.O_WRONLY | os.O_CREAT)
     for cnt in range(video_num):
         current_flv = '{}.{}'.format(apath, str(cnt))
         if os.path.exists(current_flv):
