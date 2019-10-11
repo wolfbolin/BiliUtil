@@ -44,13 +44,10 @@ class Task:
             return None
         if self.level == 'old_version':
             video_num = len(self.video)
-            if video_num > 1:
-                for cnt in range(video_num):
-                    video_name = "{}.{}".format(self.name, str(cnt))
-                    Util.aria2c_pull(self.aid, self.path, video_name, [self.video[cnt], ''], show_process)
-                Util.ffmpeg_merge_old(self.path, self.name, video_num, show_process)
-            else:
-                Util.aria2c_pull(self.aid, self.path, self.name + '.mp4', self.video, show_process)
+            for cnt in range(video_num):
+                video_name = "{}.{}".format(self.name, str(cnt))
+                Util.aria2c_pull(self.aid, self.path, video_name, [self.video[cnt], ''], show_process)
+            Util.ffmpeg_merge_old(self.path, self.name, video_num, show_process)
             return self.aid
         elif self.level == 'new_version':
             Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
