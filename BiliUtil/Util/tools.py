@@ -167,6 +167,7 @@ def aria2c_pull(aid, path, name, url_list, show_process=False):
     url = '"{}"'.format(' '.join(url_list))
     shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
     shell = shell.format(len(url_list), path, name, referer, proxies, url)
+    print("\n正在下载:{}".format(name))
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
 
