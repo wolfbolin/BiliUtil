@@ -38,7 +38,9 @@ class Task:
             with open(self.path + '/cover.jpg', 'wb') as file:
                 file.write(http_result.content)
         # 保存视频并转码
-        if no_repeat and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name))):
+        if no_repeat \
+                and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name)))\
+                and not os.path.exists(os.path.abspath('{}/{}.mp4.aria2'.format(self.path, self.name))):
             return None
         if self.level == 'old_version':
             Util.aria2c_pull(self.aid, self.path, self.name + '.mp4', self.video, show_process)
