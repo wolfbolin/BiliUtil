@@ -1,6 +1,5 @@
 # For my self
 .idea
-pipfile
 pipfile.lock
 staging.py
 
