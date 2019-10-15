@@ -47,7 +47,7 @@ class Video:
         self.quality = Util.Config.Quality.INDEX[json_data['data']['quality']]
         if 'dash' in json_data['data']:
             self.level = 'new_version'
-            video_obj = json_data['data']['dash']['video'][-1]
+            video_obj = json_data['data']['dash']['video'][0]
             audio_obj = json_data['data']['dash']['audio'][0]
             self.height = video_obj['height']
             self.width = video_obj['width']
