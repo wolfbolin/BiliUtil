@@ -1,5 +1,6 @@
 # For my self
 .idea
+pipfile.lock
 staging.py
 
 # Byte-compiled / optimized / DLL files

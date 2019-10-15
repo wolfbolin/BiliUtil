@@ -12,10 +12,11 @@ class Fetcher:
         self.task_list = None
         self.exist_list = None
 
-    def fetch_all(self, cookie=None, name_pattern=Util.Config.SET_AS_CODE):
+    def fetch_all(self, cookie=None, name_pattern=Util.Config.SET_AS_CODE, quality=None):
         """
         自动获取用户与频道名下的所有视频信息
         :param cookie: 权限信息
+        :param quality: 下载视频质量
         :param name_pattern: 路径命名方式
         :return: 所有视频的av号列表
         """
@@ -47,8 +48,8 @@ class Fetcher:
 
             video_list = album.get_video_list()
             for video in video_list:
+                video.sync(cookie, quality)
                 if name_pattern == Util.Config.SET_AS_NAME:
-                    video.sync(cookie)
                     video_name = Util.legalize_name(video.name)
                 else:
                     video_name = video.aid
@@ -74,7 +75,7 @@ class Fetcher:
         :param v_filter:
         :return: 下载列表中视频av号
         """
-        task_id = []
+        task_list = []
         self.task_list = []
         base_path = os.path.abspath(output)
         exclude = [str(item) for item in exclude]
@@ -91,10 +92,10 @@ class Fetcher:
             full_path = '{}/{}/{}'.format(base_path, info['obj_name'], info['album_name'])
             self.task_list.append(Video.Task(info['video'], full_path,
                                              info['video_name'], info['album'].cover))
-            task_id.append(info['album'].aid)
+            task_list.append(info['album'].aid)
 
-        task_id = list(set(task_id))
-        return task_id
+        task_list = list(set(task_list))
+        return task_list
 
     def load_exist(self, output):
         """
