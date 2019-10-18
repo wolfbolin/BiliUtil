@@ -164,7 +164,7 @@ def aria2c_pull(aid, path, name, url_list, show_process=False):
     proxies += ' --https-proxy="{}"'.format(Config.HTTPS_PROXY) if Config.HTTPS_PROXY is not None else ""
 
     referer = 'https://www.bilibili.com/video/av' + str(aid)
-    url = '"{}"'.format('" "'.join(url_list))
+    url = '"{}"'.format(' '.join(url_list))
     shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
     shell = shell.format(len(url_list), path, name, referer, proxies, url)
     print("\n正在下载:{}".format(name))
