@@ -9,5 +9,9 @@ if __name__ == '__main__':
     video_list = album.get_video_list()
     for video in video_list:
         video.sync(cookie="SESSDATA=abcd68fd...")
-        task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
+        if len(video_list) > 1:
+            video_name = ("P%02d " % video.page) + album.title_list[video.page - 1]
+        else:
+            video_name = album_info['name']
+        task = BiliUtil.Task(video, 'D:/BiliUtil', video_name)
         task.start()

@@ -152,7 +152,7 @@ def legalize_name(name):
     return legal_name
 
 
-def aria2c_pull(aid, path, name, url_list, show_process=False):
+def aria2c_pull(aid, path, name, url, show_process=False):
     # 设置输出信息
     if show_process:
         out_pipe = None
@@ -164,9 +164,9 @@ def aria2c_pull(aid, path, name, url_list, show_process=False):
     proxies += ' --https-proxy="{}"'.format(Config.HTTPS_PROXY) if Config.HTTPS_PROXY is not None else ""
 
     referer = 'https://www.bilibili.com/video/av' + str(aid)
-    url = '"{}"'.format(' '.join(url_list))
+    url = '"{}"'.format(url)
     shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
-    shell = shell.format(len(url_list), path, name, referer, proxies, url)
+    shell = shell.format(8, path, name, referer, proxies, url)
     print("\n正在下载:{}".format(name))
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
@@ -202,7 +202,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
 
     input_fd = os.open(txtpath, os.O_WRONLY | os.O_CREAT)
     for cnt in range(video_num):
-        current_flv = '{}.{}'.format(apath, str(cnt))
+        current_flv = '{}_{}'.format(apath, str(cnt))
         if os.path.exists(current_flv):
             os.write(input_fd, str.encode("file '{}'\n".format(current_flv)))
         else:
@@ -217,7 +217,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
     if os.path.exists(outpath):
         os.remove(txtpath)
         for cnt in range(video_num):
-            os.remove('{}.{}'.format(apath, str(cnt)))
+            os.remove('{}_{}'.format(apath, str(cnt)))
     else:
         raise RunningError('FFmpeg输出视频失败！')
 
