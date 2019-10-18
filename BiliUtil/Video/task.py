@@ -41,13 +41,14 @@ class Task:
         if no_repeat \
                 and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name)))\
                 and not os.path.exists(os.path.abspath('{}/{}.mp4.aria2'.format(self.path, self.name))):
+            # 当且仅当存在mp4文件并且不存在同名aria2文件时跳过下载
             return None
         if self.level == 'old_version':
-            video_num = len(self.video)
-            for cnt in range(video_num):
+            video_num = len(self.video)  # 获取分段数量
+            for cnt in range(video_num):  # 下载所有分段并加计数后缀进行区分
                 video_name = "{}_{}".format(self.name, str(cnt))
-                Util.aria2c_pull(self.aid, self.path, video_name, self.video[cnt], show_process)
-            Util.ffmpeg_merge_old(self.path, self.name, video_num, show_process)
+                Util.aria2c_pull(self.aid, self.path, video_name, [self.video[cnt]], show_process)
+            Util.ffmpeg_merge_old(self.path, self.name, video_num, show_process)  # 合并所有分段
             return self.aid
         elif self.level == 'new_version':
             Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)

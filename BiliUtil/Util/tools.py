@@ -164,10 +164,11 @@ def aria2c_pull(aid, path, name, url, show_process=False):
     proxies += ' --https-proxy="{}"'.format(Config.HTTPS_PROXY) if Config.HTTPS_PROXY is not None else ""
 
     referer = 'https://www.bilibili.com/video/av' + str(aid)
-    url = '"{}"'.format(url)
+    url = '"{}"'.format(url[0].strip('\''))  # url获取方式变更（希望没有改出bug）
     shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
+    # -x 选项指定了同时最大连接数，由于同一时刻只有单文件的多分段在下载，所以设置固定值8
     shell = shell.format(8, path, name, referer, proxies, url)
-    print("\n正在下载:{}".format(name))
+    # print("\n正在下载:{}".format(name))
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
 
@@ -192,6 +193,7 @@ def ffmpeg_merge(path, name, show_process=False):
 
 
 def ffmpeg_merge_old(path, name, video_num, show_process=False):
+    # 合并分段flv，转码为mp4
     if show_process:
         out_pipe = None
     else:
@@ -200,6 +202,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
     txtpath = '{}.txt'.format(apath)
     outpath = '{}.mp4'.format(apath)
 
+    # 将分段视频文件路径写入文本（直接在命令行输入路径未尝试成功），作为FFmpeg输入
     input_fd = os.open(txtpath, os.O_WRONLY | os.O_CREAT)
     for cnt in range(video_num):
         current_flv = '{}_{}'.format(apath, str(cnt))
@@ -214,6 +217,7 @@ def ffmpeg_merge_old(path, name, video_num, show_process=False):
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
 
+    # 检测合并情况，并进行临时文件清理
     if os.path.exists(outpath):
         os.remove(txtpath)
         for cnt in range(video_num):

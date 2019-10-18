@@ -59,15 +59,27 @@ pip install BiliUtil
 ```python
 import BiliUtil
 if __name__ == '__main__':
-    album = BiliUtil.Album(3947271)
+    # album = BiliUtil.Album(7134874)  # 旧版视频集合
+    # album = BiliUtil.Album(66768830)  # 新版视频集合
+    album = BiliUtil.Album(3947271)  # 旧版单个视频
+    # album = BiliUtil.Album(71420798)  # 新版单个视频
+    # 使用时无需分类，以上仅为说明各种情况均通过测试
+
     # album.set_album(3947271)
     # album.set_by_url("https://www.bilibili.com/video/av3947271")
     album_info = album.sync()
     print(album_info)
+
     video_list = album.get_video_list()
     for video in video_list:
+        # SESSDATA字段获取：在登录状态下切换到B站标签页，浏览器地址栏左侧小锁->Cookie->bilibili.com->Cookie->SESSDATA
         video.sync(cookie="SESSDATA=abcd68fd...")
-        task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
+        # 分别处理单个视频和视频集合的文件命名
+        if len(video_list) > 1:
+            video_name = ("P%02d " % video.page) + album.title_list[video.page - 1]
+        else:
+            video_name = album_info['name']
+        task = BiliUtil.Task(video, 'D:/BiliUtil', video_name)
         task.start()
 ```
 
@@ -303,24 +315,24 @@ album = BiliUtil.Album('3947271')
 
 每个实例中将包含以下成员变量，你可以在[`sync()`](#album-sync)操作后读取这些信息。
 
-| 成员变量 | 变量含义        | 默认值 |
-| -------- | --------------- | ------ |
-| aid      | 专辑aid（av号） | None   |
-| num      | 包含视频数量    | None   |
-| type     | 分区名称        | None   |
-| cover    | 封面链接        | None   |
-| name     | 视频名称        | None   |
-| time     | 发布时间        | None   |
-| desc     | 专辑描述        | None   |
-| view     | 观看人数        | None   |
-| danmu    | 弹幕数量        | None   |
-| reply    | 回复数量        | None   |
-| favorite | 收藏数量        | None   |
-| coin     | 硬币数量        | None   |
-| share    | 分享数量        | None   |
-| like     | 点赞数量        | None   |
-| cid_list | 视频cid编号列表 | None   |
-|          |                 |        |
+| 成员变量  | 变量含义        | 默认值 |
+| --------- | -------------- | ------ |
+| aid       | 专辑aid（av号） | None   |
+| num       | 包含视频数量    | None   |
+| type      | 分区名称        | None   |
+| cover     | 封面链接        | None   |
+| name      | 视频名称        | None   |
+| time      | 发布时间        | None   |
+| desc      | 专辑描述        | None   |
+| view      | 观看人数        | None   |
+| danmu     | 弹幕数量        | None   |
+| reply     | 回复数量        | None   |
+| favorite  | 收藏数量        | None   |
+| coin      | 硬币数量        | None   |
+| share     | 分享数量        | None   |
+| like      | 点赞数量        | None   |
+| cid_list  | 视频cid编号列表 | None   |
+| title_list| 视频标题列表    |        |
 
 #### 3.2、`set_album(aid)`
 

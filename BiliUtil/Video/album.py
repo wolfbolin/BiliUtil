@@ -23,7 +23,7 @@ class Album:
         self.share = None
         self.like = None
         self.cid_list = None
-        self.title_list = None
+        self.title_list = None  # 标题列表，便于为每个分P文件设置正确文件名
 
     def set_album(self, aid):
         self.aid = str(aid)

@@ -15,7 +15,7 @@ class Video:
         self.height = None
         self.width = None
         self.level = None
-        self.video = list()
+        self.video = list()  # 必定为列表类型，直接初始化为列表
         self.audio = None
 
     def sync(self, cookie=None, quality=None):
@@ -62,10 +62,10 @@ class Video:
 
         elif 'durl' in json_data['data']:
             self.level = 'old_version'
-            video_obj_list = json_data['data']['durl']
+            video_obj_list = json_data['data']['durl']  # 视频链接列表json
             for video_obj in video_obj_list:
                 self.video.append(video_obj['url'])
-                if video_obj['backup_url']:
+                if video_obj['backup_url']:  # 什么视频会有backup_url？
                     for backup in video_obj['backup_url']:
                         self.video.append(backup)
 
