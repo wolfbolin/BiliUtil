@@ -11,7 +11,7 @@ class Task:
         self.video_info = copy.deepcopy(vars(video))
         del self.video_info['video']
         del self.video_info['audio']
-        self.aid = video.aid
+        self.aid = video.album.aid
         self.level = video.level
         self.video = video.video
         self.audio = video.audio
@@ -38,14 +38,14 @@ class Task:
             with open(self.path + '/cover.jpg', 'wb') as file:
                 file.write(http_result.content)
         # 保存视频并转码
-        if no_repeat and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name))):
+        if no_repeat and os.path.exists(os.path.join(self.path, self.name)):
             return None
         if self.level == 'old_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.mp4', self.video, show_process)
-            return self.aid
+            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
         elif self.level == 'new_version':
             Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
             Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
-            Util.ffmpeg_merge(self.path, self.name, show_process)
-            sys.stdout.flush()
-            return self.aid
+
+        Util.ffmpeg_merge(self.path, self.name, show_process)
+        sys.stdout.flush()
+        return self.aid

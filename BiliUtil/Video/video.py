@@ -4,8 +4,8 @@ import BiliUtil.Util as Util
 
 
 class Video:
-    def __init__(self, aid, cid, name, page):
-        self.aid = str(aid)
+    def __init__(self, album, cid, name, page):
+        self.album = album
         self.cid = str(cid)
         self.name = name
         self.page = page
@@ -18,9 +18,27 @@ class Video:
         self.video = None
         self.audio = None
 
+    def video_name(self, name_pattern=Util.Config.SET_AS_CODE):
+        """
+        辅助生成视频文件的名称
+        :param name_pattern: 命名模式
+        :return: 经过拼接的视频文件名称
+        """
+        if name_pattern == Util.Config.SET_AS_CODE:
+            name = self.cid
+        elif name_pattern == Util.Config.SET_AS_NAME:
+            name = self.album.name
+        elif name_pattern == Util.Config.SET_AS_PAGE:
+            name = self.name
+        else:
+            name = "unknown"
+
+        name = Util.legalize_name(name)
+        return "{}_P{}_{}".format(name, self.page, self.quality[1])
+
     def sync(self, cookie=None, quality=None):
         # 检验必要的参数
-        if self.aid is None or self.cid is None:
+        if self.album.aid is None or self.cid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         if quality is None:
@@ -30,7 +48,7 @@ class Video:
         http_request = {
             'info_obj': Util.VIDEO,
             'params': {
-                'avid': str(self.aid),
+                'avid': str(self.album.aid),
                 'cid': str(self.cid),
                 'qn': quality[0],
                 'otype': 'json',
