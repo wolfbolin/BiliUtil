@@ -41,7 +41,7 @@ class Task:
         if no_repeat and os.path.exists(os.path.abspath('{}/{}.mp4'.format(self.path, self.name))):
             return None
         if self.level == 'old_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.mp4', self.video, show_process)
+            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
             return self.aid
         elif self.level == 'new_version':
             Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
