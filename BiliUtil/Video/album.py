@@ -42,6 +42,8 @@ class Album:
             name = self.aid
         elif name_pattern == Util.Config.SET_AS_NAME:
             name = self.name
+        elif name_pattern == Util.Config.SET_AS_PAGE:
+            name = self.name
         else:
             name = "unknown"
 

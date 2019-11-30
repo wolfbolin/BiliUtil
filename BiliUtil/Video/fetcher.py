@@ -32,11 +32,16 @@ class Fetcher:
             raise Util.ParameterError('该类型对象无法自动加载')
 
         # 逐级确定储存路径
-        if name_pattern == Util.Config.SET_AS_NAME:
+        if name_pattern == Util.Config.SET_AS_CODE:
+            obj_name = obj_code
+        elif name_pattern == Util.Config.SET_AS_NAME:
+            self.obj.sync()
+            obj_name = Util.legalize_name(self.obj.name)
+        elif name_pattern == Util.Config.SET_AS_PAGE:
             self.obj.sync()
             obj_name = Util.legalize_name(self.obj.name)
         else:
-            obj_name = obj_code
+            obj_name = "unknown"
 
         album_list = self.obj.get_album_list()
         for album in album_list:
