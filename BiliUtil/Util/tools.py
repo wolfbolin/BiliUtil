@@ -15,6 +15,7 @@ from fake_useragent import UserAgent
 class Config:
     SET_AS_NAME = 1
     SET_AS_CODE = 2
+    SET_AS_PAGE = 3
 
     HTTP_PROXY = None  # http://user:pass@1.2.3.4:5678
     HTTPS_PROXY = None  # https://user:pass@1.2.3.4:5678

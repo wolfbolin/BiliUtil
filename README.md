@@ -339,7 +339,15 @@ album.set_user('3947271')
 album.set_by_url('https://www.bilibili.com/video/av3947271')
 ```
 
-#### 3.4、`sync(cookie=None)`<span id="album-sync"/>
+#### 3.4、`album_name(name_pattern=Util.Config.SET_AS_CODE)`
+
+你可以通过该操作获取标准化的专辑名称，同时你可以通过参数的方式生成不同命名方式的名称
+
+```python
+album_name = album.album_name()
+```
+
+#### 3.5、`sync(cookie=None)`<span id="album-sync"/>
 
 你可用通过该操作更新对象的成员变量，如果你感觉信息不够丰满，请与开发者联系。
 
@@ -347,7 +355,7 @@ album.set_by_url('https://www.bilibili.com/video/av3947271')
 album_info = album.sync(cookie='SESSDATA=abcd68fd...')
 ```
 
-#### 3.5、`get_video_list(cookie=None)`<span id="album-get_video_list"/>
+#### 3.6、`get_video_list(cookie=None)`<span id="album-get_video_list"/>
 
 你可以通过该操作获取每个专辑中的视频对象，返回值中将储存本工具包中视频类的对象。
 
@@ -379,7 +387,15 @@ get_video_list(cookie='SESSDATA=abcd68fd...')
 | audio    | 视频链接            | list() |
 |          |                     |        |
 
-#### 4.2、`sync(cookie=None， quality=None)`<span id="video-sync"/>
+#### 4.2、`video_name(name_pattern=Util.Config.SET_AS_CODE)`
+
+你可以通过该操作获取标准化的视频名称，同时你可以通过参数的方式生成不同命名方式的名称
+
+```
+video_name = video.video_name(Util.Config.SET_AS_PAGE)
+```
+
+#### 4.3、`sync(cookie=None， quality=None)`<span id="video-sync"/>
 
 你可用通过该操作更新对象的成员变量，如果你感觉信息不够丰满，请与开发者联系。
 

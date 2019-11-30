@@ -32,6 +32,24 @@ class Album:
         aid = re.match('/video/av([0-9]+)', input_url.path).group(1)
         self.aid = str(aid)
 
+    def album_name(self, name_pattern=Util.Config.SET_AS_CODE):
+        """
+        辅助生成视频文件的名称
+        :param name_pattern: 命名模式
+        :return: 经过拼接的视频文件名称
+        """
+        if self.name is None:
+            self.sync()
+
+        if name_pattern == Util.Config.SET_AS_CODE:
+            name = self.aid
+        elif name_pattern == Util.Config.SET_AS_NAME:
+            name = self.name
+        else:
+            name = "unknown"
+
+        return Util.legalize_name(name)
+
     def sync(self, cookie=None):
         # 检验必要的参数
         if self.aid is None:
@@ -78,7 +96,7 @@ class Album:
 
         video_list = []
         for index, info in enumerate(self.video_info):
-            cv = Video.Video(self, info[0], info[1], index+1)
+            cv = Video.Video(self, info[0], info[1], index + 1)
             video_list.append(cv)
 
         return video_list
