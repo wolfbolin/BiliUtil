@@ -149,29 +149,30 @@ if __name__ == '__main__':
 
 ## 三、接口文档<span id="document"/>
 
-在第四章[QA](#四Q&A)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
+在第四章[QA](#四QA)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
 
 ### 0、常量与含义<span id="config"/>
 
 常量中包含了文件命名方式的定义，画质信息的定义，全局代理设置的定义等内容。
 
-| 常量             | 值                               | 含义               |
-| ---------------- | -------------------------------- | ------------------ |
-| 命名方式         |                                  |                    |
-| SET_AS_NAME      | 1                                | 以视频名称命名路径 |
-| SET_AS_CODE      | 2                                | 以对象编号命名路径 |
-| 网络代理         |                                  |                    |
-| HTTP_PROXY       | 例http://user:pass@1.2.3.4:5678  | HTTP代理设置       |
-| HTTPS_PROXY      | 例https://user:pass@1.2.3.4:5678 | HTTPS代理设置      |
-| 视频画质         |                                  |                    |
-| Quality.V360P    | ('16', '流畅 360P')              | 360P               |
-| Quality.V480P    | ('32', '清晰 480P')              | 480P               |
-| Quality.V720P    | ('64', '高清 720P')              | 720P（登录）       |
-| Quality.V720P60  | ('74', '高清 720P60')            | 720P60（会员）     |
-| Quality.V1080P   | ('80', '高清 1080P')             | 1080P（登录）      |
-| Quality.V1080Px  | ('112', '高清 1080P+')           | 1080P+（会员）     |
-| Quality.V1080P60 | ('116', '高清 1080P60')          | 1080P60（会员）    |
-|                  |                                  |                    |
+| 常量             | 值                               | 含义            |
+| ---------------- | -------------------------------- | --------------- |
+| 命名方式         |                                  |                 |
+| SET_AS_NAME      | 1                                | 以视频名称命名  |
+| SET_AS_CODE      | 2                                | 以对象编号命名  |
+| SET_AS_PAGE      | 3                                | 以分P文件命名   |
+| 网络代理         |                                  |                 |
+| HTTP_PROXY       | 例http://user:pass@1.2.3.4:5678  | HTTP代理设置    |
+| HTTPS_PROXY      | 例https://user:pass@1.2.3.4:5678 | HTTPS代理设置   |
+| 视频画质         |                                  |                 |
+| Quality.V360P    | ('16', '流畅 360P')              | 360P            |
+| Quality.V480P    | ('32', '清晰 480P')              | 480P            |
+| Quality.V720P    | ('64', '高清 720P')              | 720P（登录）    |
+| Quality.V720P60  | ('74', '高清 720P60')            | 720P60（会员）  |
+| Quality.V1080P   | ('80', '高清 1080P')             | 1080P（登录）   |
+| Quality.V1080Px  | ('112', '高清 1080P+')           | 1080P+（会员）  |
+| Quality.V1080P60 | ('116', '高清 1080P60')          | 1080P60（会员） |
+|                  |                                  |                 |
 
 
 
@@ -362,21 +363,21 @@ get_video_list(cookie='SESSDATA=abcd68fd...')
 
 每个实例中将包含以下成员变量，你可以在[`sync()`](#video-sync)操作后读取这些信息。
 
-| 成员变量 | 变量含义        | 默认值 |
-| -------- | --------------- | ------ |
-| aid      | 专辑aid（av号） | None   |
-| cid      | 视频cid         | None   |
-| name     | 视频名称        | None   |
-| page     | 视频编号（分P） | None   |
-| quality  | 视频画质        | None   |
-| length   | 视频长度        | None   |
-| format   | 视频格式        | None   |
-| height   | 视频高度        | None   |
-| width    | 视频宽度        | None   |
-| level    | 视频版本        | None   |
-| video    | 视频链接        | list() |
-| audio    | 视频链接        | list() |
-|          |                 |        |
+| 成员变量 | 变量含义            | 默认值 |
+| -------- | ------------------- | ------ |
+| album      | 专辑对象     | None   |
+| cid      | 视频cid             | None   |
+| name     | 视频名称（分P名称） | None   |
+| page     | 视频编号（分P序号） | None   |
+| quality  | 视频画质            | None   |
+| length   | 视频长度            | None   |
+| format   | 视频格式            | None   |
+| height   | 视频高度            | None   |
+| width    | 视频宽度            | None   |
+| level    | 视频版本            | None   |
+| video    | 视频链接            | list() |
+| audio    | 视频链接            | list() |
+|          |                     |        |
 
 #### 4.2、`sync(cookie=None， quality=None)`<span id="video-sync"/>
 
@@ -490,10 +491,12 @@ video_info = video.sync(
 - 通过cookie信息，你可以在下载视频的时候获取到更高清的视频数据，也可以手动指定视频清晰度。
 
 - 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1123761144%2C38d97xyz`的cookie信息也是可以被识别的。也可以传入字典类型的cookie信息，但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
-- 不同的身份信息视频质量上线表：
+- 不同的身份信息视频质量上限表：
   - 未登录--->480P
   - 已登录--->1080P
   - 大会员--->1080P60FPS / 1080P+
+  
+  - 关键的cookie存在与发往`*.bilibili.com`域下，发往其他域的请求中不包含该信息。至于如何在浏览器中获取Cookie，请移步：[如何在浏览器中获取Cookie](http://baidux.tinoy.cn/?q=%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%8E%B7%E5%8F%96Cookie)
 
 ### 什么是专辑Album和视频Video有什么区别？
 
@@ -508,16 +511,6 @@ video_info = video.sync(
 ### set_by_url有什么要求？
 
 当我们打开了用户或视频时，URL中就已经包含了我们生成对象所需要的信息。在声明对象实例时，我们可以利用这些信息，由于不是使用正则进行匹配的，因此你可以随心所欲的拷贝URL，包括带有参数的URL都是可以接受的。但是，请确保传入的URL是与对象类型相匹配的，否则可能会导致程序运行异常。
-
-###  cookie的设置有什么要求？
-
-* cookie信息不影响除视频画质外其他信息的获取。
-* 设定cookie信息时，类似于`_uuid=B45CF1AB-xxx; LIVE_BUVID=AUTO76154xxx; SESSDATA=abcd68fd%2C1123761144%2C38d97xyz`的cookie信息也是可以被识别的。但是cookie信息中必须包含`SESSDATA`字段，该字段是提升视频质量的关键点。
-
-* 不同的身份信息可下载视频的映射表：
-  * 未登录--->V360P/V480P
-  * 已登录--->V1080P/V720P
-  * 大会员--->V720P60/V1080Px/V1080P60
 
 ### 为什么要用到FFmpeg？
 
