@@ -62,6 +62,7 @@ class Album:
         self.share = json_data['data']['stat']['share']
         self.like = json_data['data']['stat']['like']
         self.cid_list = list(page['cid'] for page in json_data['data']['pages'])
+        self.title_list = list(page['part'] for page in json_data['data']['pages'])
 
         # 返回专辑信息
         return copy.deepcopy(vars(self))
@@ -76,7 +77,7 @@ class Album:
 
         video_list = []
         for index, cid in enumerate(self.cid_list):
-            cv = Video.Video(self.aid, cid, self.name, index+1)
+            cv = Video.Video(self.aid, cid, self.title_list[index], index+1)
             video_list.append(cv)
 
         return video_list
