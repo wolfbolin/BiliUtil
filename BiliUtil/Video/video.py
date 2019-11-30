@@ -34,7 +34,7 @@ class Video:
             name = "unknown"
 
         name = Util.legalize_name(name)
-        return "{}_P{}_{}".format(name, self.page, self.quality)
+        return "{}_P{}_{}".format(name, self.page, self.quality[1])
 
     def sync(self, cookie=None, quality=None):
         # 检验必要的参数

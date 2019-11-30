@@ -73,9 +73,9 @@ class Fetcher:
         # 逐个过滤并生成任务
         for info in self.info_list:
             # 执行过滤策略
-            if info['album'].aid in exclude:
+            if info['album'][1].aid in exclude:
                 continue
-            elif v_filter is not None and v_filter.check_video(info['video']):
+            elif v_filter is not None and v_filter.check_video(info['video'][1]):
                 continue
 
             # 创建新的下载任务

@@ -1,7 +1,8 @@
 # For my self
 .idea
 pipfile.lock
-staging.py
+pip_upload.txt
+cookie.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -95,4 +96,4 @@ ENV/
 *.npy
 *.pkl
 
-pip_upload\.txt
+

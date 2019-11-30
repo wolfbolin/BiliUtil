@@ -187,6 +187,8 @@ def ffmpeg_merge(path, name, show_process=False):
         process.wait()
         os.remove(flv_file)
         os.remove(aac_file)
+    elif os.path.exists(flv_file):
+        os.rename(flv_file, mp4_file)
     else:
         raise RunningError('找不到下载的音视频文件')
 
