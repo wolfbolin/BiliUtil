@@ -24,9 +24,6 @@ class Video:
         :param name_pattern: 命名模式
         :return: 经过拼接的视频文件名称
         """
-        if self.quality is None:
-            self.sync()
-
         if name_pattern == Util.Config.SET_AS_CODE:
             name = self.cid
         elif name_pattern == Util.Config.SET_AS_NAME:

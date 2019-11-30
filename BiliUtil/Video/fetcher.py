@@ -40,28 +40,18 @@ class Fetcher:
 
         album_list = self.obj.get_album_list()
         for album in album_list:
-            if name_pattern == Util.Config.SET_AS_NAME:
-                album.sync()
-                album_name = Util.legalize_name(album.name)
-            else:
-                album_name = album.aid
+            album.sync(cookie)
+            album_name = album.album_name(name_pattern)
 
             video_list = album.get_video_list()
             for video in video_list:
                 video.sync(cookie, quality)
-                if name_pattern == Util.Config.SET_AS_NAME:
-                    video_name = Util.legalize_name(video.name)
-                else:
-                    video_name = video.aid
-                video_name = '{}_P{}_{}'.format(video_name, video.page, video.quality[1])
+                video_name = video.video_name(name_pattern)
 
                 self.info_list.append({
-                    'obj': self.obj,
-                    'obj_name': obj_name,
-                    'album': album,
-                    'album_name': album_name,
-                    'video': video,
-                    'video_name': video_name
+                    'obj': (obj_name, self.obj),
+                    'album': (album_name, album),
+                    'video': (video_name, video)
                 })
                 av_list.append(album.aid)
         av_list = list(set(av_list))
@@ -89,10 +79,9 @@ class Fetcher:
                 continue
 
             # 创建新的下载任务
-            full_path = '{}/{}/{}'.format(base_path, info['obj_name'], info['album_name'])
-            self.task_list.append(Video.Task(info['video'], full_path,
-                                             info['video_name'], info['album'].cover))
-            task_list.append(info['album'].aid)
+            full_path = os.path.join(base_path, info['obj'][0], info['album'][0])
+            self.task_list.append(Video.Task(info['video'][1], full_path, info['video'][0], info['album'][1].cover))
+            task_list.append(info['album'][1].aid)
 
         task_list = list(set(task_list))
         return task_list
@@ -110,12 +99,12 @@ class Fetcher:
         base_path = os.path.abspath(output)
 
         for info in self.info_list:
-            all_video_list.append(info['album'].aid)
-            video_path = '{}/{}/{}/{}.mp4'.format(base_path, info['obj_name'], info['album_name'], info['video_name'])
+            all_video_list.append(info['album'][1].aid)
+            video_path = os.path.join(base_path, info['obj'][0], info['album'][0], '{}.mp4'.format(info['video'][0]))
             if os.path.exists(video_path):
-                positive_list.append(info['album'].aid)
+                positive_list.append(info['album'][1].aid)
             else:
-                negative_list.append(info['album'].aid)
+                negative_list.append(info['album'][1].aid)
 
         all_video_list = set(all_video_list)
         positive_list = list(set(positive_list))
