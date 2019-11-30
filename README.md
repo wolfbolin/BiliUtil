@@ -6,15 +6,20 @@
 ![Python](https://img.shields.io/badge/Python-3.7-blue.svg)
 ![Version](https://img.shields.io/badge/Version-2.x-blueviolet.svg)
 
-Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下。最新的BUG修复与功能调整请参考[QA](#qa)或[更新日志](#update)
+Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（一百个Star冲鸭）。
 
-> What's News?
+
+
+> 特性
 >
-> * 简化代码结构与文档长度，简化使用方式
-> * cookie直接透传至，管理cookie更方面
-> * 多连接小分片并行下载，提高下载成功率与速度
->* 支持根据视频属性、视频分P过滤无需下载的视频
-> * 支持设定下载代理地址，让流量走一些神奇的通道
+> * 用户与频道内视频批量下载
+> * 支持匿名至大会员画质下载
+> * 开放灵活详细的API编程接口
+>* 视频分块多链接下载与自动合成
+
+
+
+常见问题请参考[Q&A](#qa)  | BUG修复请参考[更新日志](#update)
 
 
 
@@ -32,7 +37,9 @@ Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG�
 
 六、[更新日志](#update)
 
-## 
+
+
+
 
 ## 一、安装方式<span id="install"/>
 
@@ -99,57 +106,15 @@ if __name__ == '__main__':
 
 ```
 
-高配样例
 
-```python
-# coding=utf-8
-import BiliUtil
 
-user_list = [
-    ("4282930", "豆豆子", []),
-    ("8366990", "欣小萌", [])
-]
-
-video_cache = r'D:\Bilibili'
-cookie = "SESSDATA=abcd68fd..."
-
-# 设置代理信息
-# BiliUtil.Config.HTTP_PROXY = 'http://127.0.0.1:12639'
-# BiliUtil.Config.HTTPS_PROXY = 'http://127.0.0.1:12639'
-
-if __name__ == '__main__':
-    # 初始化过滤器
-    # 设置视频质量限制
-    quality = [BiliUtil.Config.Quality.V1080P,
-               BiliUtil.Config.Quality.V1080Px,
-               BiliUtil.Config.Quality.V1080P60,
-               BiliUtil.Config.Quality.V720P60,
-               BiliUtil.Config.Quality.V720P]
-    length = [40, 600]  # 设置视频长度
-    ratio = [1, 2]  # 设置视频比例，只保留横屏
-    video_filter = BiliUtil.Filter(quality=quality, length=length, ratio=ratio)
-
-    # 扫描指定用户并下载
-    for up in user_list:
-        print('正在下载用户:{} 的视频'.format(up[1]))
-        user = BiliUtil.User(up[0])
-        fetcher = BiliUtil.Fetcher(user)
-        av_list = fetcher.fetch_all(cookie, BiliUtil.Config.SET_AS_NAME)
-        positive_list, negative_list = fetcher.load_exist(video_cache)
-        exclude_list = positive_list + up[2]
-        task_id = fetcher.load_task(video_cache, exclude_list, video_filter)
-        download_list = fetcher.pull_all()
-        print('完成{}个视频下载：{}'.format(len(download_list), download_list))
-
-```
-
-更多功能与样例，期待你的发现
+高配版示例程序请见[example3.py](https://github.com/wolfbolin/BiliUtil/blob/master/example3.py)和[example4.py](https://github.com/wolfbolin/BiliUtil/blob/master/example3.py)，其中example4.py是我个人自测自用程序，涉及大多数使用场景，可靠性与适用性MAX
 
 
 
 ## 三、接口文档<span id="document"/>
 
-在第四章[QA](#四QA)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
+在第四章[Q&A](#四QA)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
 
 ### 0、常量与含义<span id="config"/>
 
@@ -488,6 +453,30 @@ video_info = video.sync(
 
 ## 四、Q&A<span id="qa"/>
 
+### 开发进度与缺陷
+
+目前已完成开发的模块
+
+* 用户信息获取与视频列表拉取
+* 频道信息获取与视频列表拉取
+* 专辑信息获取与视频列表拉取
+* 视频信息获取
+* 任务列表生成器
+* 视频列表过滤器
+* 已存视频检查器
+* 新版多P视频下载与合成
+* 旧版单视频下载与转换
+
+目前尚存在缺陷的功能
+
+* 旧版分段视频下载与合成
+
+期望或将要开发的功能
+
+* 视频弹幕获取与保存
+* 视频评论获取与保存
+* 远程视频缓存server
+
 ### 下载流程简单说明
 
 使用者在下载的过程中一般遵循一下步骤：初始化对象-->获取视频对象-->创建任务-->开始下载
@@ -542,7 +531,9 @@ video_info = video.sync(
 
 
 
-其他未尽适宜请提[Issue](https://github.com/wolfbolin/BiliUtil/issues)
+**其他未尽适宜请提[Issue](https://github.com/wolfbolin/BiliUtil/issues)**
+
+
 
 ## 五、关于BiliUtil<span id="about"/>
 
@@ -556,6 +547,21 @@ video_info = video.sync(
 
 
 ## 六、更新日志<span id="update"/>
+
+### v0.2.2
+
+修复
+
+* [Issue #24](https://github.com/wolfbolin/BiliUtil/issues/24) [PR #25](https://github.com/wolfbolin/BiliUtil/pull/25)缓存视频允许以分P名称命名视频
+* [driverCzn](https://github.com/driverCzn) 提出的BUG，解决旧版视频下载一半后无法自动断点续传的检测策略问题
+
+优化
+
+* 代码结构与语法优化
+
+缺陷
+
+* [driverCzn](https://github.com/driverCzn) 提出但尚未解决的“旧版长视频分段下载”问题
 
 ### v0.2.1
 
