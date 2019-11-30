@@ -4,8 +4,8 @@ import BiliUtil.Util as Util
 
 
 class Video:
-    def __init__(self, aid, cid, name, page):
-        self.aid = str(aid)
+    def __init__(self, album, cid, name, page):
+        self.album = album
         self.cid = str(cid)
         self.name = name
         self.page = page
@@ -20,7 +20,7 @@ class Video:
 
     def sync(self, cookie=None, quality=None):
         # 检验必要的参数
-        if self.aid is None or self.cid is None:
+        if self.album.aid is None or self.cid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         if quality is None:
@@ -30,7 +30,7 @@ class Video:
         http_request = {
             'info_obj': Util.VIDEO,
             'params': {
-                'avid': str(self.aid),
+                'avid': str(self.album.aid),
                 'cid': str(self.cid),
                 'qn': quality[0],
                 'otype': 'json',

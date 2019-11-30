@@ -22,7 +22,7 @@ class Album:
         self.coin = None
         self.share = None
         self.like = None
-        self.cid_list = None
+        self.video_info = None
 
     def set_album(self, aid):
         self.aid = str(aid)
@@ -61,8 +61,9 @@ class Album:
         self.coin = json_data['data']['stat']['coin']
         self.share = json_data['data']['stat']['share']
         self.like = json_data['data']['stat']['like']
-        self.cid_list = list(page['cid'] for page in json_data['data']['pages'])
-        self.title_list = list(page['part'] for page in json_data['data']['pages'])
+        self.video_info = list()
+        for page in json_data['data']['pages']:
+            self.video_info.append((page['cid'], page['part']))
 
         # 返回专辑信息
         return copy.deepcopy(vars(self))
@@ -72,12 +73,12 @@ class Album:
         if self.aid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
 
-        if self.cid_list is None:
+        if self.video_info is None:
             self.sync(cookie)
 
         video_list = []
-        for index, cid in enumerate(self.cid_list):
-            cv = Video.Video(self.aid, cid, self.title_list[index], index+1)
+        for index, info in enumerate(self.video_info):
+            cv = Video.Video(self, info[0], info[1], index+1)
             video_list.append(cv)
 
         return video_list
