@@ -3,10 +3,10 @@
 ![Windows](https://img.shields.io/badge/Windows-support-green.svg)
 ![Linux](https://img.shields.io/badge/Linux-testing-orange.svg)
 ![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
-![Python](https://img.shields.io/badge/Python-3.7-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.8-blue.svg)
 ![Version](https://img.shields.io/badge/Version-2.x-blueviolet.svg)
 
-Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（一百个Star冲鸭）。
+Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（两百个Star冲鸭）。
 
 
 
@@ -19,7 +19,7 @@ Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG�
 
 
 
-常见问题请参考[Q&A](#qa)  | BUG修复请参考[更新日志](#update)
+常见问题请参考[Q&A](#qa)  | BUG修复请参考[更新日志](#update) | 新的疑问请参考[反馈列表](https://github.com/wolfbolin/BiliUtil/issues)
 
 
 
@@ -201,7 +201,7 @@ channel_list = user.get_channel_list(cookie='SESSDATA=abcd68fd...')
 
 #### 1.6、`get_album_list(cookie=None)`
 
-你可以通过该操作获取用户公开的全部视频，返回值中将储存本工具包中[专辑类](#albumclass)的对象。
+你可以通过该操作获取用户公开的全部视频，返回值中将储存本工具包中[稿件类](#albumclass)的对象。
 
 ```python
 get_album_list(cookie='SESSDATA=abcd68fd...')
@@ -228,7 +228,7 @@ channel = BiliUtil.Channel(uid='20165629', cid='9108')
 | cid        | 频道cid            | None   |
 | name       | 频道名称           | None   |
 | cover      | 频道封面           | None   |
-| count      | 频道内专辑数量     | None   |
+| count      | 频道内稿件数量     | None   |
 |            |                    |        |
 
 #### 2.2、`set_channel(uid, cid)`
@@ -249,7 +249,7 @@ channel.set_by_url('https://space.bilibili.com/20165629/channel/detail?cid=9108'
 
 #### 2.4、`get_album_list(cookie=None)`<span id="channel-get_album_list"/>
 
-你可用通过该操作获取该频道中的全部专辑对象，返回值中将储存本工具包中[专辑类](#albumclass)的对象。
+你可用通过该操作获取该频道中的全部稿件对象，返回值中将储存本工具包中[稿件类](#albumclass)的对象。
 
 ```python
 channel_info = channel.get_album_list(cookie='SESSDATA=abcd68fd...')
@@ -257,11 +257,11 @@ channel_info = channel.get_album_list(cookie='SESSDATA=abcd68fd...')
 
 
 
-### 3、专辑类（BiliUtil.Album）<span id="alnbumclass"/>
+### 3、稿件类（BiliUtil.Album）<span id="alnbumclass"/>
 
 #### 3.1、`__init__(aid=None)`
 
-你可以为每一个专辑声明一个对象实例，在声明时你可以指定专辑aid（av号），或者同步数据前设定专辑aid（av号）。关于专辑与视频的区别请参考[Q&A](#qa)加强对名词的理解。
+你可以为每一个稿件声明一个对象实例，在声明时你可以指定稿件aid（av号），或者同步数据前设定稿件aid（av号）。关于稿件与视频的区别请参考[Q&A](#qa)加强对名词的理解。
 
 ```python
 album = BiliUtil.Album('3947271')
@@ -271,13 +271,13 @@ album = BiliUtil.Album('3947271')
 
 | 成员变量 | 变量含义        | 默认值 |
 | -------- | --------------- | ------ |
-| aid      | 专辑aid（av号） | None   |
+| aid      | 稿件aid（av号） | None   |
 | num      | 包含视频数量    | None   |
 | type     | 分区名称        | None   |
 | cover    | 封面链接        | None   |
 | name     | 视频名称        | None   |
 | time     | 发布时间        | None   |
-| desc     | 专辑描述        | None   |
+| desc     | 稿件描述        | None   |
 | view     | 观看人数        | None   |
 | danmu    | 弹幕数量        | None   |
 | reply    | 回复数量        | None   |
@@ -290,7 +290,7 @@ album = BiliUtil.Album('3947271')
 
 #### 3.2、`set_album(aid)`
 
-你可以使用该函数设定专辑aid或重新指定专辑aid，该操作不会重置成员变量。
+你可以使用该函数设定稿件aid或重新指定稿件aid，该操作不会重置成员变量。
 
 ```python
 album.set_user('3947271')
@@ -298,7 +298,7 @@ album.set_user('3947271')
 
 #### 3.3、`set_by_url(url)`
 
-你可以通过该函数以url解析的方式指定对象的专辑aid，该操作不会重置成员变量。
+你可以通过该函数以url解析的方式指定对象的稿件aid，该操作不会重置成员变量。
 
 ```python
 album.set_by_url('https://www.bilibili.com/video/av3947271')
@@ -306,7 +306,7 @@ album.set_by_url('https://www.bilibili.com/video/av3947271')
 
 #### 3.4、`album_name(name_pattern=Util.Config.SET_AS_CODE)`
 
-你可以通过该操作获取标准化的专辑名称，同时你可以通过参数的方式生成不同命名方式的名称
+你可以通过该操作获取标准化的稿件名称，同时你可以通过参数的方式生成不同命名方式的名称
 
 ```python
 album_name = album.album_name()
@@ -322,7 +322,7 @@ album_info = album.sync(cookie='SESSDATA=abcd68fd...')
 
 #### 3.6、`get_video_list(cookie=None)`<span id="album-get_video_list"/>
 
-你可以通过该操作获取每个专辑中的视频对象，返回值中将储存本工具包中视频类的对象。
+你可以通过该操作获取每个稿件中的视频对象，返回值中将储存本工具包中视频类的对象。
 
 ```python
 get_video_list(cookie='SESSDATA=abcd68fd...')
@@ -332,13 +332,13 @@ get_video_list(cookie='SESSDATA=abcd68fd...')
 
 #### 4.1、`__init__(aid=None, cid=None)`
 
-不建议使用者自行创建视频对象，请使用专辑类的[`get_video_list()`](#album-get_video_list)操作获取视频类对象实例列表。
+不建议使用者自行创建视频对象，请使用稿件类的[`get_video_list()`](#album-get_video_list)操作获取视频类对象实例列表。
 
 每个实例中将包含以下成员变量，你可以在[`sync()`](#video-sync)操作后读取这些信息。
 
 | 成员变量 | 变量含义            | 默认值 |
 | -------- | ------------------- | ------ |
-| album      | 专辑对象     | None   |
+| album      | 稿件对象     | None   |
 | cid      | 视频cid             | None   |
 | name     | 视频名称（分P名称） | None   |
 | page     | 视频编号（分P序号） | None   |
@@ -391,7 +391,7 @@ video_info = video.sync(
 
 #### 5.3、`load_exist(ouput)`
 
-你可以使用该函数加载输出目录中已经存在的视频列表，返回值分为乐观策略和悲观策略。在乐观策略状态下专辑实例有存在视频即认为存在， 在悲观策略状态下专辑实例所有视频都存在才认为存在。
+你可以使用该函数加载输出目录中已经存在的视频列表，返回值分为乐观策略和悲观策略。在乐观策略状态下稿件实例有存在视频即认为存在， 在悲观策略状态下稿件实例所有视频都存在才认为存在。
 
 该函数的设计是为了避免在视频下载时程序重复下载视频浪费流量与时间，也避免过多请求被官方风控。
 
@@ -402,7 +402,7 @@ video_info = video.sync(
 该函数提供了两个可选参数
 
 * exclude：排除列表，当视频av号命中该列表中av号时，将自动跳过不创建下载任务。
-* v_filter：过滤器，当专辑中的视频命中了过滤器的过滤条件时，将不创建下载任务。
+* v_filter：过滤器，当稿件中的视频命中了过滤器的过滤条件时，将不创建下载任务。
 
 #### 5.5、`pull_all(show_process=True, no_repeat=True)`
 
@@ -459,7 +459,7 @@ video_info = video.sync(
 
 * 用户信息获取与视频列表拉取
 * 频道信息获取与视频列表拉取
-* 专辑信息获取与视频列表拉取
+* 稿件信息获取与视频列表拉取
 * 视频信息获取
 * 任务列表生成器
 * 视频列表过滤器
@@ -503,15 +503,15 @@ video_info = video.sync(
   
   - 关键的cookie存在与发往`*.bilibili.com`域下，发往其他域的请求中不包含该信息。至于如何在浏览器中获取Cookie，请移步：[如何在浏览器中获取Cookie](http://baidux.tinoy.cn/?q=%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%8E%B7%E5%8F%96Cookie)
 
-### 什么是专辑Album和视频Video有什么区别？
+### 什么是稿件Album和视频Video有什么区别？
 
-首先说明这个专辑不是平时常说的唱片专辑，这个专辑是指包含了多个视频的一个集合，代表了用户的一次发布。
+首先说明这个"Album"在此不翻译为“唱片;专辑”，这个"Album"是指包含了多个视频的一个集合，在B站页面中显示为“稿件”，代表了用户的一次投稿发布。
 
-众所周知许多Up会上传多P，多P就对应了多个视频，因此一个av号可能会对应多个视频。所以在文档中我们不能再使用“视频”这个词汇来表达一个av号所对应的资源，因此便采用了“专辑”这个词汇来表达。
+众所周知许多Up会上传多P，多P就对应了多个视频，因此一个av号可能会对应多个视频。所以在文档中我们不能再使用“视频”这个词汇来表达一个av号所对应的资源，因此便采用了“稿件”这个词汇来表达。
 
 ### 什么是uid、cid、aid？
 
-我们需要为每一个资源做一个标记，官方也是这么做的。如果你真的经常使用B站，那么你一定知道UID为2的 **碧诗**和av号，本工具包沿用了B站的编号体系，不仅仅是用户与专辑，每一个频道与视频都是有他们自己的编号的。
+我们需要为每一个资源做一个标记，官方也是这么做的。如果你真的经常使用B站，那么你一定知道UID为2的 **碧诗**和av号，本工具包沿用了B站的编号体系，不仅仅是用户与稿件，每一个频道与视频都是有他们自己的编号的。
 
 ### set_by_url有什么要求？
 
@@ -620,7 +620,7 @@ video_info = video.sync(
 新增
 
 - 为频道与用户对象添加获取已下载视频的AV号列表。
-- 为专辑对象添加判断视频是否已下载的访问接口
+- 为稿件对象添加判断视频是否已下载的访问接口
 
 ### v0.1.5
 

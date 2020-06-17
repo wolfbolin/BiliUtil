@@ -34,9 +34,9 @@ class Album:
 
     def album_name(self, name_pattern=Util.Config.SET_AS_CODE):
         """
-        辅助生成专辑文件的名称
+        辅助生成稿件文件的名称
         :param name_pattern: 命名模式
-        :return: 经过拼接的专辑文件名称
+        :return: 经过拼接的稿件文件名称
         """
         if name_pattern == Util.Config.SET_AS_CODE:
             name = self.aid
@@ -82,7 +82,7 @@ class Album:
         for page in json_data['data']['pages']:
             self.video_info.append((page['cid'], page['part']))
 
-        # 返回专辑信息
+        # 返回稿件信息
         return copy.deepcopy(vars(self))
 
     def get_video_list(self, cookie=None):
