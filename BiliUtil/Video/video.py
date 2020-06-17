@@ -77,7 +77,7 @@ class Video:
                     self.video.append(backup)
             if audio_obj['backup_url']:
                 for backup in audio_obj['backup_url']:
-                    self.video.append(backup)
+                    self.audio.append(backup)
 
         elif 'durl' in json_data['data']:
             self.level = 'old_version'
