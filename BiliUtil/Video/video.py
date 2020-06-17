@@ -42,7 +42,7 @@ class Video:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         if quality is None:
-            quality = Util.Config.Quality.V1080P60
+            quality = Util.Config.Quality.V4K
 
         # 发送网络请求
         http_request = {
@@ -52,6 +52,7 @@ class Video:
                 'cid': str(self.cid),
                 'qn': quality[0],
                 'otype': 'json',
+                'fourk': 1,
                 'fnver': 0,
                 'fnval': 16
             },
