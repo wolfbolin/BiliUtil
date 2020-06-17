@@ -7,6 +7,7 @@ import requests
 import subprocess
 from urllib import parse
 from fake_useragent import UserAgent
+from requests.adapters import HTTPAdapter
 
 
 # from BiliUtil import http_proxy, https_proxy
@@ -81,6 +82,48 @@ CHANNEL_LIST = {
     'origin': 'https://space.bilibili.com',
     'referer': 'https://space.bilibili.com'
 }
+
+alphabet = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF"
+
+
+def bv2av(bv):
+    bv = str(bv)
+    r = 0
+    for i, v in enumerate([11, 10, 3, 8, 4, 6]):
+        r += alphabet.find(bv[v]) * 58 ** i
+    return str((r - 0x2_0840_07c0) ^ 0x0a93_b324)
+
+
+def av2bv(av):
+    av = str(av)
+    if av.startswith("av"):
+        av = str(av[2:])
+    else:
+        av = int(av)
+    x = (av ^ 0x0a93_b324) + 0x2_0840_07c0
+    r = list('BV1**4*1*7**')
+    for v in [11, 10, 3, 8, 4, 6]:
+        x, d = divmod(x, 58)
+        r[v] = alphabet[d]
+    return str(''.join(r))
+
+
+def to_bv(vid):
+    vid = str(vid)
+    if vid.startswith("BV"):
+        return vid
+    else:
+        return av2bv(vid)
+
+
+def to_av(vid):
+    vid = str(vid)
+    if vid.startswith("BV"):
+        return bv2av(vid)
+    elif vid.startswith("av"):
+        return str(vid[2:])
+    else:
+        return vid
 
 
 def http_header(info_obj):
