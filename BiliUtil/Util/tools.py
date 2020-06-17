@@ -102,6 +102,8 @@ def http_get(info_obj, params, cookie=None):
 
     # 获取请求头信息
     new_http_header = http_header(info_obj)
+
+    # 设定Cookies信息
     if cookie is not None:
         if isinstance(cookie, dict):
             cookie = {
@@ -121,28 +123,31 @@ def http_get(info_obj, params, cookie=None):
         cookie = dict()
 
     # 尝试进行网络连接
-    for times in range(5):
-        try:
-            http_result = requests.get(url=info_obj['url'], params=params, cookies=cookie,
-                                       headers=new_http_header, timeout=5, proxies=proxies)
-        except requests.exceptions:
-            time.sleep(3)
-            continue
-        # 尝试理解并验证响应数据
-        if http_result.status_code == 200:
-            try:
-                json_data = json.loads(http_result.text)
-            except json.decoder.JSONDecodeError:
-                time.sleep(1)
-                continue
-            if 'code' in json_data and json_data['code'] == 0:
-                return json_data
-            elif 'status' in json_data and json_data['status'] is True:
-                return json_data
-            elif json_data['code'] == -404 or json_data['code'] == -403:
-                raise RunningError('请求对象异常或被锁定，无法获取')
+    client = requests.session()
+    client.mount("http://", HTTPAdapter(max_retries=5))
+    client.mount("https://", HTTPAdapter(max_retries=5))
 
-    raise RunningError('多次网络请求均未能获得数据：{}'.format(info_obj['url']))
+    try:
+        http_result = client.get(url=info_obj['url'], params=params, cookies=cookie,
+                                 headers=new_http_header, timeout=5, proxies=proxies)
+    except requests.exceptions:
+        raise ConnectError('多次网络请求均未能获得数据：{}'.format(info_obj['url']))
+
+    # 尝试理解并验证响应数据
+    if http_result.status_code == 200:
+        try:
+            json_data = json.loads(http_result.text)
+        except json.decoder.JSONDecodeError:
+            raise RunningError('请求响应无法解析：{}'.format(http_result.text))
+
+        if 'code' in json_data and json_data['code'] == 0:
+            return json_data
+        elif 'status' in json_data and json_data['status'] is True:
+            return json_data
+        elif json_data['code'] == -404 or json_data['code'] == -403:
+            raise RunningError('请求对象异常或被锁定，无法获取')
+    else:
+        raise ConnectError('网络响应状态异常，HTTP响应码：{}'.format(http_result.status_code))
 
 
 def legalize_name(name):
@@ -202,6 +207,14 @@ class ParameterError(Exception):
 
 
 class RunningError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class ConnectError(Exception):
     def __init__(self, value):
         self.value = value
 
