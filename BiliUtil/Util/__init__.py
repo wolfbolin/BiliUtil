@@ -8,6 +8,10 @@ from .tools import ALBUM
 from .tools import VIDEO
 from .tools import CHANNEL
 from .tools import CHANNEL_LIST
+from .tools import av2bv
+from .tools import bv2av
+from .tools import to_av
+from .tools import to_bv
 from .tools import http_get
 from .tools import legalize_name
 from .tools import aria2c_pull

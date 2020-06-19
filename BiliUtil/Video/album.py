@@ -8,7 +8,7 @@ import BiliUtil.Video as Video
 
 class Album:
     def __init__(self, aid=None):
-        self.aid = str(aid)
+        self.aid = Util.to_av(aid)
         self.num = None
         self.type = None
         self.cover = None
@@ -25,18 +25,18 @@ class Album:
         self.video_info = None
 
     def set_album(self, aid):
-        self.aid = str(aid)
+        self.aid = Util.to_av(aid)
 
     def set_by_url(self, url):
         input_url = parse.urlparse(url)
-        aid = re.match('/video/av([0-9]+)', input_url.path).group(1)
-        self.aid = str(aid)
+        bid = re.match('/video/(BV[0-9a-zA-Z]+|av[0-9]+)', input_url.path).group(1)
+        self.aid = Util.to_av(bid)
 
     def album_name(self, name_pattern=Util.Config.SET_AS_CODE):
         """
-        辅助生成专辑文件的名称
+        辅助生成稿件文件的名称
         :param name_pattern: 命名模式
-        :return: 经过拼接的专辑文件名称
+        :return: 经过拼接的稿件文件名称
         """
         if name_pattern == Util.Config.SET_AS_CODE:
             name = self.aid
@@ -82,7 +82,7 @@ class Album:
         for page in json_data['data']['pages']:
             self.video_info.append((page['cid'], page['part']))
 
-        # 返回专辑信息
+        # 返回稿件信息
         return copy.deepcopy(vars(self))
 
     def get_video_list(self, cookie=None):
@@ -95,7 +95,7 @@ class Album:
 
         video_list = []
         for index, info in enumerate(self.video_info):
-            cv = Video.Video(self, info[0], info[1], index + 1)
-            video_list.append(cv)
+            video = Video.Video(self, info[0], info[1], index + 1)
+            video_list.append(video)
 
         return video_list

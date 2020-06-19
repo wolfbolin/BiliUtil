@@ -3,23 +3,25 @@
 ![Windows](https://img.shields.io/badge/Windows-support-green.svg)
 ![Linux](https://img.shields.io/badge/Linux-testing-orange.svg)
 ![License](https://img.shields.io/badge/License-MPL_2.0-orange.svg)
-![Python](https://img.shields.io/badge/Python-3.7-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.8-blue.svg)
 ![Version](https://img.shields.io/badge/Version-2.x-blueviolet.svg)
 
-Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（一百个Star冲鸭）。
+Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（两百个Star冲鸭）。
+
+特别提醒：鉴于B站快速的发展，目前代码包中仍在使用一些新版中废弃的接口，如果某日B站关闭了旧接口服务，可能会导致本函数包不可用（虽然已经找到了新的获取方式，但是懒得改代码了，非Json接口获取成本++）
 
 
 
 > 特性
 >
 > * 用户与频道内视频批量下载
-> * 支持匿名至大会员画质下载
+> * 支持360P至4K全部画质下载
 > * 开放灵活详细的API编程接口
->* 视频分块多链接下载与自动合成
+>* 多链接分块下载与自动合成
 
 
 
-常见问题请参考[Q&A](#qa)  | BUG修复请参考[更新日志](#update)
+常见问题请参考[Q&A](#qa)  | BUG修复请参考[更新日志](#update) | 新的疑问请参考[反馈列表](https://github.com/wolfbolin/BiliUtil/issues)
 
 
 
@@ -59,21 +61,37 @@ pip install BiliUtil
 
 插件官网：<https://ffmpeg.org/>
 
-## 二、使用样例<span id="example"/>
+
+
+## 二、使用示例<span id="example"/>
 
 获取视频信息并下载视频
 
 ```python
 import BiliUtil
+from cookie import cookie_info
+
 if __name__ == '__main__':
-    album = BiliUtil.Album(3947271)
-    # album.set_album(3947271)
-    # album.set_by_url("https://www.bilibili.com/video/av3947271")
+    # DNA视频下载
+    album = BiliUtil.Album("170001")
+    # album = BiliUtil.Album("av170001")
+    # album = BiliUtil.Album("BV17x411w7KC")
+    # album.set_album("456025297")
+    # album.set_album("av456025297")
+    # album.set_album("BV17x411w7KC")
+    # album.set_by_url("https://www.bilibili.com/video/av170001")
+    # album.set_by_url("https://www.bilibili.com/video/BV17x411w7KC")
+
+    # 4K视频下载测试
+    # album = BiliUtil.Album("BV1QV411R7d1")
+
     album_info = album.sync()
     print(album_info)
+
     video_list = album.get_video_list()
+    print(video_list)
     for video in video_list:
-        video.sync(cookie="SESSDATA=abcd68fd...")
+        video.sync(cookie=cookie_info)
         task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
         task.start()
 ```
@@ -86,7 +104,7 @@ if __name__ == '__main__':
     cookie = "SESSDATA=abcd68fd..."
     cache = "D:/BiliUtil"
 
-    user = BiliUtil.User(20165629)
+    user = BiliUtil.User(20165629) # 他发的太多了，建议换个人尝试
     # user.set_user(user)
     # user.set_by_url("https://space.bilibili.com/20165629")
     user_info = user.sync()
@@ -116,7 +134,9 @@ if __name__ == '__main__':
 
 在第四章[Q&A](#四QA)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
 
-### 0、常量与含义<span id="config"/>
+### 0、数据字典与基础函数
+
+## 常量与含义<span id="config"/>
 
 常量中包含了文件命名方式的定义，画质信息的定义，全局代理设置的定义等内容。
 
@@ -137,7 +157,32 @@ if __name__ == '__main__':
 | Quality.V1080P   | ('80', '高清 1080P')             | 1080P（登录）   |
 | Quality.V1080Px  | ('112', '高清 1080P+')           | 1080P+（会员）  |
 | Quality.V1080P60 | ('116', '高清 1080P60')          | 1080P60（会员） |
+| Quality.V4K      | ('120', '超清 4K')               | 4K（会员）      |
 |                  |                                  |                 |
+
+
+
+## 基础函数功能
+
+### BiliUtil.Util.av2bv(av)
+
+该函数可将形如`av170001`，`170001`的av号转化为形如`BV17x411w7KC`的新编码方式
+
+> 编码转换算法代码参考来源：https://blog.csdn.net/jkddf9h8xd9j646x798t/article/details/105124465
+
+### BiliUtil.Util.bv2av(bv)
+
+该函数可将形如`BV17x411w7KC`的bv号转化为形如`170001`的旧编码方式
+
+> 编码转换算法代码参考来源：https://blog.csdn.net/jkddf9h8xd9j646x798t/article/details/105124465
+
+### BiliUtil.Util.to_bv(av)
+
+该函数可识别av、bv号并都转化为bv号的编码形式
+
+### BiliUtil.Util.to_av(av)
+
+该函数可识别av、bv号并都转化为av号的编码形式
 
 
 
@@ -201,7 +246,7 @@ channel_list = user.get_channel_list(cookie='SESSDATA=abcd68fd...')
 
 #### 1.6、`get_album_list(cookie=None)`
 
-你可以通过该操作获取用户公开的全部视频，返回值中将储存本工具包中[专辑类](#albumclass)的对象。
+你可以通过该操作获取用户公开的全部视频，返回值中将储存本工具包中[稿件类](#albumclass)的对象。
 
 ```python
 get_album_list(cookie='SESSDATA=abcd68fd...')
@@ -228,7 +273,7 @@ channel = BiliUtil.Channel(uid='20165629', cid='9108')
 | cid        | 频道cid            | None   |
 | name       | 频道名称           | None   |
 | cover      | 频道封面           | None   |
-| count      | 频道内专辑数量     | None   |
+| count      | 频道内稿件数量     | None   |
 |            |                    |        |
 
 #### 2.2、`set_channel(uid, cid)`
@@ -249,7 +294,7 @@ channel.set_by_url('https://space.bilibili.com/20165629/channel/detail?cid=9108'
 
 #### 2.4、`get_album_list(cookie=None)`<span id="channel-get_album_list"/>
 
-你可用通过该操作获取该频道中的全部专辑对象，返回值中将储存本工具包中[专辑类](#albumclass)的对象。
+你可用通过该操作获取该频道中的全部稿件对象，返回值中将储存本工具包中[稿件类](#albumclass)的对象。
 
 ```python
 channel_info = channel.get_album_list(cookie='SESSDATA=abcd68fd...')
@@ -257,11 +302,11 @@ channel_info = channel.get_album_list(cookie='SESSDATA=abcd68fd...')
 
 
 
-### 3、专辑类（BiliUtil.Album）<span id="alnbumclass"/>
+### 3、稿件类（BiliUtil.Album）<span id="alnbumclass"/>
 
 #### 3.1、`__init__(aid=None)`
 
-你可以为每一个专辑声明一个对象实例，在声明时你可以指定专辑aid（av号），或者同步数据前设定专辑aid（av号）。关于专辑与视频的区别请参考[Q&A](#qa)加强对名词的理解。
+你可以为每一个稿件声明一个对象实例，在声明时你可以指定稿件aid（av号），或者同步数据前设定稿件aid（av号）。关于稿件与视频的区别请参考[Q&A](#qa)加强对名词的理解。
 
 ```python
 album = BiliUtil.Album('3947271')
@@ -271,13 +316,13 @@ album = BiliUtil.Album('3947271')
 
 | 成员变量 | 变量含义        | 默认值 |
 | -------- | --------------- | ------ |
-| aid      | 专辑aid（av号） | None   |
+| aid      | 稿件aid（av号） | None   |
 | num      | 包含视频数量    | None   |
 | type     | 分区名称        | None   |
 | cover    | 封面链接        | None   |
 | name     | 视频名称        | None   |
 | time     | 发布时间        | None   |
-| desc     | 专辑描述        | None   |
+| desc     | 稿件描述        | None   |
 | view     | 观看人数        | None   |
 | danmu    | 弹幕数量        | None   |
 | reply    | 回复数量        | None   |
@@ -290,7 +335,7 @@ album = BiliUtil.Album('3947271')
 
 #### 3.2、`set_album(aid)`
 
-你可以使用该函数设定专辑aid或重新指定专辑aid，该操作不会重置成员变量。
+你可以使用该函数设定稿件aid或重新指定稿件aid，该操作不会重置成员变量。
 
 ```python
 album.set_user('3947271')
@@ -298,7 +343,7 @@ album.set_user('3947271')
 
 #### 3.3、`set_by_url(url)`
 
-你可以通过该函数以url解析的方式指定对象的专辑aid，该操作不会重置成员变量。
+你可以通过该函数以url解析的方式指定对象的稿件aid，该操作不会重置成员变量。
 
 ```python
 album.set_by_url('https://www.bilibili.com/video/av3947271')
@@ -306,7 +351,7 @@ album.set_by_url('https://www.bilibili.com/video/av3947271')
 
 #### 3.4、`album_name(name_pattern=Util.Config.SET_AS_CODE)`
 
-你可以通过该操作获取标准化的专辑名称，同时你可以通过参数的方式生成不同命名方式的名称
+你可以通过该操作获取标准化的稿件名称，同时你可以通过参数的方式生成不同命名方式的名称
 
 ```python
 album_name = album.album_name()
@@ -322,7 +367,7 @@ album_info = album.sync(cookie='SESSDATA=abcd68fd...')
 
 #### 3.6、`get_video_list(cookie=None)`<span id="album-get_video_list"/>
 
-你可以通过该操作获取每个专辑中的视频对象，返回值中将储存本工具包中视频类的对象。
+你可以通过该操作获取每个稿件中的视频对象，返回值中将储存本工具包中视频类的对象。
 
 ```python
 get_video_list(cookie='SESSDATA=abcd68fd...')
@@ -332,13 +377,13 @@ get_video_list(cookie='SESSDATA=abcd68fd...')
 
 #### 4.1、`__init__(aid=None, cid=None)`
 
-不建议使用者自行创建视频对象，请使用专辑类的[`get_video_list()`](#album-get_video_list)操作获取视频类对象实例列表。
+不建议使用者自行创建视频对象，请使用稿件类的[`get_video_list()`](#album-get_video_list)操作获取视频类对象实例列表。
 
 每个实例中将包含以下成员变量，你可以在[`sync()`](#video-sync)操作后读取这些信息。
 
 | 成员变量 | 变量含义            | 默认值 |
 | -------- | ------------------- | ------ |
-| album      | 专辑对象     | None   |
+| album      | 稿件对象     | None   |
 | cid      | 视频cid             | None   |
 | name     | 视频名称（分P名称） | None   |
 | page     | 视频编号（分P序号） | None   |
@@ -391,7 +436,7 @@ video_info = video.sync(
 
 #### 5.3、`load_exist(ouput)`
 
-你可以使用该函数加载输出目录中已经存在的视频列表，返回值分为乐观策略和悲观策略。在乐观策略状态下专辑实例有存在视频即认为存在， 在悲观策略状态下专辑实例所有视频都存在才认为存在。
+你可以使用该函数加载输出目录中已经存在的视频列表，返回值分为乐观策略和悲观策略。在乐观策略状态下稿件实例有存在视频即认为存在， 在悲观策略状态下稿件实例所有视频都存在才认为存在。
 
 该函数的设计是为了避免在视频下载时程序重复下载视频浪费流量与时间，也避免过多请求被官方风控。
 
@@ -402,7 +447,7 @@ video_info = video.sync(
 该函数提供了两个可选参数
 
 * exclude：排除列表，当视频av号命中该列表中av号时，将自动跳过不创建下载任务。
-* v_filter：过滤器，当专辑中的视频命中了过滤器的过滤条件时，将不创建下载任务。
+* v_filter：过滤器，当稿件中的视频命中了过滤器的过滤条件时，将不创建下载任务。
 
 #### 5.5、`pull_all(show_process=True, no_repeat=True)`
 
@@ -459,13 +504,15 @@ video_info = video.sync(
 
 * 用户信息获取与视频列表拉取
 * 频道信息获取与视频列表拉取
-* 专辑信息获取与视频列表拉取
+* 稿件信息获取与视频列表拉取
 * 视频信息获取
 * 任务列表生成器
 * 视频列表过滤器
 * 已存视频检查器
 * 新版多P视频下载与合成
 * 旧版单视频下载与转换
+* 4K120FPS视频下载兼容
+* BV与AV编码转换
 
 目前尚存在缺陷的功能
 
@@ -473,6 +520,7 @@ video_info = video.sync(
 
 期望或将要开发的功能
 
+* 多线程视频信息获取
 * 视频弹幕获取与保存
 * 视频评论获取与保存
 * 远程视频缓存server
@@ -499,19 +547,19 @@ video_info = video.sync(
 - 不同的身份信息视频质量上限表：
   - 未登录--->480P
   - 已登录--->1080P
-  - 大会员--->1080P60FPS / 1080P+
+  - 大会员--->1080P60FPS / 1080P+ / 4K120FPS
   
   - 关键的cookie存在与发往`*.bilibili.com`域下，发往其他域的请求中不包含该信息。至于如何在浏览器中获取Cookie，请移步：[如何在浏览器中获取Cookie](http://baidux.tinoy.cn/?q=%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%8E%B7%E5%8F%96Cookie)
 
-### 什么是专辑Album和视频Video有什么区别？
+### 什么是稿件Album和视频Video有什么区别？
 
-首先说明这个专辑不是平时常说的唱片专辑，这个专辑是指包含了多个视频的一个集合，代表了用户的一次发布。
+首先说明这个"Album"在此不翻译为“唱片;专辑”，这个"Album"是指包含了多个视频的一个集合，在B站页面中显示为“稿件”，代表了用户的一次投稿发布。
 
-众所周知许多Up会上传多P，多P就对应了多个视频，因此一个av号可能会对应多个视频。所以在文档中我们不能再使用“视频”这个词汇来表达一个av号所对应的资源，因此便采用了“专辑”这个词汇来表达。
+众所周知许多Up会上传多P，多P就对应了多个视频，因此一个av号可能会对应多个视频。所以在文档中我们不能再使用“视频”这个词汇来表达一个av号所对应的资源，因此便采用了“稿件”这个词汇来表达。
 
 ### 什么是uid、cid、aid？
 
-我们需要为每一个资源做一个标记，官方也是这么做的。如果你真的经常使用B站，那么你一定知道UID为2的 **碧诗**和av号，本工具包沿用了B站的编号体系，不仅仅是用户与专辑，每一个频道与视频都是有他们自己的编号的。
+我们需要为每一个资源做一个标记，官方也是这么做的。如果你真的经常使用B站，那么你一定知道UID为2的 **碧诗**和av号，本工具包沿用了B站的编号体系，不仅仅是用户与稿件，每一个频道与视频都是有他们自己的编号的。
 
 ### set_by_url有什么要求？
 
@@ -521,13 +569,17 @@ video_info = video.sync(
 
 在B站更新了数据下发形式后，你所观看的每一个视频都由纯视频和纯音频的形式下发，因此我们在下载之后需要使用工具将这些数据封装在一起。工具的使用方法我已经封装在代码中，默认会在视频下载结束后完成合并渲染。
 
-### 新旧视频版本
+### 新旧视频版本的区别
 
 目前视频的版本主要分为两种，由程序内部自动判断。对于旧版视频，因为在下载前无法获取视频的具体参数，因此不可使用过滤器中的部分功能，而且旧版视频音画是在同一个视频容器中，因此无需合并数据，但同时旧版视频仅支持单链接下载，没有多服务器下发的能力。视频的下载速度可能会受到影响。
 
-### 画质分级与最高画质
+### 画质分级与最高下载画质
 
-根据B站的限制，拥有不同身份的用户能够看到的视频数据有所不同，因此在下载视频时应尽量使用有大会员的用户身份进行下载。否则，即使你咋程序中指定的是v1080Px也无法获取到该画质的视频。毕竟这个工具包不是搞大会员破解的。
+根据B站的限制，拥有不同身份的用户能够看到的视频数据有所不同，因此在下载视频时应尽量使用有大会员的用户身份进行下载。否则，即使你在程序中指定的是v1080Px也无法获取到该画质的视频。毕竟这个工具包不是搞大会员破解的。
+
+### BV与AV号
+
+在本工具包开发直出还没有BV号的概念，所有代码中对于一个稿件的唯一性判断都已AV号为准，因此在兼容BV号的过程中，工具包在所有可能输入BV号的入口都添加了BV=>AV转换的函数。该转换函数仅依赖本地计算即可完成，无需网络调用，不影响下载流程与性能。但是如果您需要对代码进行Debug，需要注意的是在工具包内部的函数调用与网络访问都是以AV号进行的。
 
 
 
@@ -542,11 +594,28 @@ video_info = video.sync(
 
 你可以联系我：mailto@wolfbolin.com
 
-**声明：该博客内容仅供学习参考，请勿用于商业目的**
+**声明：该代码库内容仅供学习参考，请勿用于商业目的**
 
 
 
 ## 六、更新日志<span id="update"/>
+
+### v0.2.3
+
+修复
+
+* [Issue #37](https://github.com/wolfbolin/BiliUtil/issues/37) 提出的音频下载问题
+
+新增
+
+* AV号、BV号转换函数与内嵌识别
+* [Issue #37](https://github.com/wolfbolin/BiliUtil/issues/37) 最高4K120FPS视频下载支持
+
+计划
+
+* 多线程数据获取函数
+* 多段视频获取方案实现
+* （以上两个部分我在实现过程中不稳定概率高，难以达到发布的水平，请多包涵）
 
 ### v0.2.2
 
@@ -620,7 +689,7 @@ video_info = video.sync(
 新增
 
 - 为频道与用户对象添加获取已下载视频的AV号列表。
-- 为专辑对象添加判断视频是否已下载的访问接口
+- 为稿件对象添加判断视频是否已下载的访问接口
 
 ### v0.1.5
 

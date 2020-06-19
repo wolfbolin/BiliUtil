@@ -12,4 +12,4 @@ requests = "==2.22.0"
 fake-useragent = "==0.1.11"
 
 [requires]
-python_version = "3.7"
+python_version = "3"
