@@ -8,14 +8,16 @@
 
 Bilibili.com（B站）数据下载工具包。若您在使用过程中发现BUG或有可以改进之处，欢迎提交[Issue](https://github.com/wolfbolin/BiliUtil/issues)或邮件（mailto@wolfbolin.com）与我联系。如果觉得还不错，欢迎Star和Fork支持一下（两百个Star冲鸭）。
 
+特别提醒：鉴于B站快速的发展，目前代码包中仍在使用一些新版中废弃的接口，如果某日B站关闭了旧接口服务，可能会导致本函数包不可用（虽然已经找到了新的获取方式，但是懒得改代码了，非Json接口获取成本++）
+
 
 
 > 特性
 >
 > * 用户与频道内视频批量下载
-> * 支持匿名至大会员画质下载
+> * 支持360P至4K全部画质下载
 > * 开放灵活详细的API编程接口
->* 视频分块多链接下载与自动合成
+>* 多链接分块下载与自动合成
 
 
 
@@ -59,21 +61,37 @@ pip install BiliUtil
 
 插件官网：<https://ffmpeg.org/>
 
-## 二、使用样例<span id="example"/>
+
+
+## 二、使用示例<span id="example"/>
 
 获取视频信息并下载视频
 
 ```python
 import BiliUtil
+from cookie import cookie_info
+
 if __name__ == '__main__':
-    album = BiliUtil.Album(3947271)
-    # album.set_album(3947271)
-    # album.set_by_url("https://www.bilibili.com/video/av3947271")
+    # DNA视频下载
+    album = BiliUtil.Album("170001")
+    # album = BiliUtil.Album("av170001")
+    # album = BiliUtil.Album("BV17x411w7KC")
+    # album.set_album("456025297")
+    # album.set_album("av456025297")
+    # album.set_album("BV17x411w7KC")
+    # album.set_by_url("https://www.bilibili.com/video/av170001")
+    # album.set_by_url("https://www.bilibili.com/video/BV17x411w7KC")
+
+    # 4K视频下载测试
+    # album = BiliUtil.Album("BV1QV411R7d1")
+
     album_info = album.sync()
     print(album_info)
+
     video_list = album.get_video_list()
+    print(video_list)
     for video in video_list:
-        video.sync(cookie="SESSDATA=abcd68fd...")
+        video.sync(cookie=cookie_info)
         task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
         task.start()
 ```
@@ -86,7 +104,7 @@ if __name__ == '__main__':
     cookie = "SESSDATA=abcd68fd..."
     cache = "D:/BiliUtil"
 
-    user = BiliUtil.User(20165629)
+    user = BiliUtil.User(20165629) # 他发的太多了，建议换个人尝试
     # user.set_user(user)
     # user.set_by_url("https://space.bilibili.com/20165629")
     user_info = user.sync()
@@ -116,7 +134,9 @@ if __name__ == '__main__':
 
 在第四章[Q&A](#四QA)中将讲解常见问题与逻辑结构，如有需要请移步第四章，那里可能有你想问的。本章仅讲解工具包的使用方法，简单粗暴便于理解。
 
-### 0、常量与含义<span id="config"/>
+### 0、数据字典与基础函数
+
+## 常量与含义<span id="config"/>
 
 常量中包含了文件命名方式的定义，画质信息的定义，全局代理设置的定义等内容。
 
@@ -138,6 +158,31 @@ if __name__ == '__main__':
 | Quality.V1080Px  | ('112', '高清 1080P+')           | 1080P+（会员）  |
 | Quality.V1080P60 | ('116', '高清 1080P60')          | 1080P60（会员） |
 | Quality.V4K      | ('120', '超清 4K')               | 4K（会员）      |
+|                  |                                  |                 |
+
+
+
+## 基础函数功能
+
+### BiliUtil.Util.av2bv(av)
+
+该函数可将形如`av170001`，`170001`的av号转化为形如`BV17x411w7KC`的新编码方式
+
+> 编码转换算法代码参考来源：https://blog.csdn.net/jkddf9h8xd9j646x798t/article/details/105124465
+
+### BiliUtil.Util.bv2av(bv)
+
+该函数可将形如`BV17x411w7KC`的bv号转化为形如`170001`的旧编码方式
+
+> 编码转换算法代码参考来源：https://blog.csdn.net/jkddf9h8xd9j646x798t/article/details/105124465
+
+### BiliUtil.Util.to_bv(av)
+
+该函数可识别av、bv号并都转化为bv号的编码形式
+
+### BiliUtil.Util.to_av(av)
+
+该函数可识别av、bv号并都转化为av号的编码形式
 
 
 
@@ -466,6 +511,8 @@ video_info = video.sync(
 * 已存视频检查器
 * 新版多P视频下载与合成
 * 旧版单视频下载与转换
+* 4K120FPS视频下载兼容
+* BV与AV编码转换
 
 目前尚存在缺陷的功能
 
@@ -473,6 +520,7 @@ video_info = video.sync(
 
 期望或将要开发的功能
 
+* 多线程视频信息获取
 * 视频弹幕获取与保存
 * 视频评论获取与保存
 * 远程视频缓存server
@@ -499,7 +547,7 @@ video_info = video.sync(
 - 不同的身份信息视频质量上限表：
   - 未登录--->480P
   - 已登录--->1080P
-  - 大会员--->1080P60FPS / 1080P+
+  - 大会员--->1080P60FPS / 1080P+ / 4K120FPS
   
   - 关键的cookie存在与发往`*.bilibili.com`域下，发往其他域的请求中不包含该信息。至于如何在浏览器中获取Cookie，请移步：[如何在浏览器中获取Cookie](http://baidux.tinoy.cn/?q=%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%8E%B7%E5%8F%96Cookie)
 
@@ -521,13 +569,17 @@ video_info = video.sync(
 
 在B站更新了数据下发形式后，你所观看的每一个视频都由纯视频和纯音频的形式下发，因此我们在下载之后需要使用工具将这些数据封装在一起。工具的使用方法我已经封装在代码中，默认会在视频下载结束后完成合并渲染。
 
-### 新旧视频版本
+### 新旧视频版本的区别
 
 目前视频的版本主要分为两种，由程序内部自动判断。对于旧版视频，因为在下载前无法获取视频的具体参数，因此不可使用过滤器中的部分功能，而且旧版视频音画是在同一个视频容器中，因此无需合并数据，但同时旧版视频仅支持单链接下载，没有多服务器下发的能力。视频的下载速度可能会受到影响。
 
-### 画质分级与最高画质
+### 画质分级与最高下载画质
 
-根据B站的限制，拥有不同身份的用户能够看到的视频数据有所不同，因此在下载视频时应尽量使用有大会员的用户身份进行下载。否则，即使你咋程序中指定的是v1080Px也无法获取到该画质的视频。毕竟这个工具包不是搞大会员破解的。
+根据B站的限制，拥有不同身份的用户能够看到的视频数据有所不同，因此在下载视频时应尽量使用有大会员的用户身份进行下载。否则，即使你在程序中指定的是v1080Px也无法获取到该画质的视频。毕竟这个工具包不是搞大会员破解的。
+
+### BV与AV号
+
+在本工具包开发直出还没有BV号的概念，所有代码中对于一个稿件的唯一性判断都已AV号为准，因此在兼容BV号的过程中，工具包在所有可能输入BV号的入口都添加了BV=>AV转换的函数。该转换函数仅依赖本地计算即可完成，无需网络调用，不影响下载流程与性能。但是如果您需要对代码进行Debug，需要注意的是在工具包内部的函数调用与网络访问都是以AV号进行的。
 
 
 
@@ -542,11 +594,28 @@ video_info = video.sync(
 
 你可以联系我：mailto@wolfbolin.com
 
-**声明：该博客内容仅供学习参考，请勿用于商业目的**
+**声明：该代码库内容仅供学习参考，请勿用于商业目的**
 
 
 
 ## 六、更新日志<span id="update"/>
+
+### v0.2.3
+
+修复
+
+* [Issue #37](https://github.com/wolfbolin/BiliUtil/issues/37) 提出的音频下载问题
+
+新增
+
+* AV号、BV号转换函数与内嵌识别
+* [Issue #37](https://github.com/wolfbolin/BiliUtil/issues/37) 最高4K120FPS视频下载支持
+
+计划
+
+* 多线程数据获取函数
+* 多段视频获取方案实现
+* （以上两个部分我在实现过程中不稳定概率高，难以达到发布的水平，请多包涵）
 
 ### v0.2.2
 

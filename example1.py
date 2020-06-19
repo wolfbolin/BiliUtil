@@ -3,7 +3,7 @@ from cookie import cookie_info
 
 if __name__ == '__main__':
     # DNA视频下载
-    album = BiliUtil.Album("170001")
+    # album = BiliUtil.Album("170001")
     # album = BiliUtil.Album("av170001")
     # album = BiliUtil.Album("BV17x411w7KC")
     # album.set_album("456025297")
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # album.set_by_url("https://www.bilibili.com/video/BV17x411w7KC")
 
     # 4K视频下载测试
-    # album = BiliUtil.Album("BV1QV411R7d1")
+    album = BiliUtil.Album("BV1fK4y1t7hj")
 
     album_info = album.sync()
     print(album_info)
@@ -22,5 +22,5 @@ if __name__ == '__main__':
     print(video_list)
     for video in video_list:
         video.sync(cookie=cookie_info)
-        # task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
-        # task.start()
+        task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
+        task.start()
