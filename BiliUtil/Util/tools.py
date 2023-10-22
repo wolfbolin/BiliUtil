@@ -11,6 +11,8 @@ from requests.adapters import HTTPAdapter
 
 
 # from BiliUtil import http_proxy, https_proxy
+class FetchConfig:
+    ALL = 0
 
 
 class Config:
@@ -55,12 +57,12 @@ HEADER = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7'
 }
 USER = {
-    'url': 'http://api.bilibili.com/x/space/acc/info',
+    'url': 'http://api.bilibili.com/x/space/wbi/acc/info',
     'origin': 'https://space.bilibili.com',
     'referer': 'https://space.bilibili.com'
 }
 USER_VIDEO = {
-    'url': 'http://space.bilibili.com/ajax/member/getSubmitVideos',
+    'url': 'http://api.bilibili.com/x/space/wbi/arc/search',
     'origin': 'https://space.bilibili.com',
     'referer': 'https://space.bilibili.com'
 }
@@ -132,7 +134,7 @@ def http_header(info_obj):
     header = HEADER.copy()
     useragent_path = os.path.dirname(__file__) + '/fake_useragent.json'
     header['Host'] = parse.urlparse(info_obj['url']).netloc
-    header['User-Agent'] = UserAgent(path=useragent_path).random
+    header['User-Agent'] = UserAgent().random
     header['Origin'] = info_obj['origin']
     header['Referer'] = info_obj['referer']
     return header

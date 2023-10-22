@@ -1,13 +1,13 @@
 # coding=utf-8
+from __future__ import annotations
 import os
 import re
 import warnings
 
 from BiliUtil.Util import Config
 
-from BiliUtil.Space import User
-from BiliUtil.Space import Channel
-
+from BiliUtil.Space.channel import Channel
+from BiliUtil.Space.user import User
 from BiliUtil.Video import Album
 from BiliUtil.Video import Video
 
@@ -24,5 +24,3 @@ if _aria2c_result is not None and _aria2c_result.group(1) == 'aria2':
         warnings.warn("QAQ~ 您未配置ffmpeg渲染环境，Task, Filter, Fetcher类不可用")
 else:
     warnings.warn("QAQ~ 您未配置aria2c下载环境，Task, Filter, Fetcher类不可用")
-
-

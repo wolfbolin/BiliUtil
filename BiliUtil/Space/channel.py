@@ -1,8 +1,8 @@
 # coding=utf-8
+from __future__ import annotations
 import re
 from urllib import parse
 import BiliUtil.Util as Util
-import BiliUtil.Video as Video
 
 
 class Channel:
@@ -28,7 +28,7 @@ class Channel:
         # 检验必要的参数
         if self.uid is None or self.cid is None:
             raise Util.ParameterError('缺少获取频道列表的必要参数')
-
+        import BiliUtil.Video as Video
         # 发送网络请求
         http_request = {
             'info_obj': Util.CHANNEL,

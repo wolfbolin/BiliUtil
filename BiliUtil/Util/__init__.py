@@ -18,3 +18,4 @@ from .tools import aria2c_pull
 from .tools import ffmpeg_merge
 from .tools import ParameterError
 from .tools import RunningError
+from .tools import FetchConfig
