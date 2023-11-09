@@ -51,7 +51,7 @@ class Album:
 
         return Util.legalize_name(name)
 
-    def sync(self, cookie: Optional[str] = None) -> Dict[str, Any]:
+    async def sync(self) -> Dict[str, Any]:
         # 检验必要的参数
         if self.aid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
@@ -62,9 +62,9 @@ class Album:
             'params': {
                 'aid': str(self.aid)
             },
-            'cookie': cookie
+            'cookie': Util.get_cookie()
         }
-        json_data = Util.http_get(**http_request)
+        json_data = await Util.http_get(**http_request)
 
         # 修改对象信息
         self.num = json_data['data']['videos']
@@ -85,13 +85,13 @@ class Album:
         # 返回稿件信息
         return copy.deepcopy(vars(self))
 
-    def get_video_list(self, cookie: Optional[str] = None) -> List[Video.Video]:
+    async def get_video_list(self) -> List[Video.Video]:
         # 检验必要的参数
         if self.aid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
 
         if self.video_info is None:
-            self.sync(cookie)
+            await self.sync()
 
         return [Video.Video(self, info[0], info[1], index + 1) for index, info in enumerate(self.video_info)]
 

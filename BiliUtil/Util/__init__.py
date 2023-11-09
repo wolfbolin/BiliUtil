@@ -19,3 +19,5 @@ from .tools import ffmpeg_merge
 from .tools import ParameterError
 from .tools import RunningError
 from .tools import FetchConfig
+from .tools import set_cookie
+from .tools import get_cookie

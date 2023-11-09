@@ -36,7 +36,7 @@ class Video:
         name = Util.legalize_name(name)
         return "{}_P{}_{}".format(name, self.page, self.quality[1])
 
-    def sync(self, cookie=None, quality=None):
+    async def sync(self, quality=None):
         # 检验必要的参数
         if self.album.aid is None or self.cid is None:
             raise Util.ParameterError('缺少获取视频信息的必要参数')
@@ -56,9 +56,9 @@ class Video:
                 'fnver': 0,
                 'fnval': 16
             },
-            'cookie': cookie
+            'cookie': Util.get_cookie()
         }
-        json_data = Util.http_get(**http_request)
+        json_data = await Util.http_get(**http_request)
 
         # 自动识别不同的数据
         self.format = json_data['data']['format']

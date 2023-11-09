@@ -8,6 +8,7 @@ import subprocess
 from urllib import parse
 from fake_useragent import UserAgent
 from requests.adapters import HTTPAdapter
+import aiohttp
 
 
 # from BiliUtil import http_proxy, https_proxy
@@ -140,12 +141,7 @@ def http_header(info_obj):
     return header
 
 
-def http_get(info_obj, params, cookie=None):
-    # 获取代理配置
-    proxies = {
-        'http': Config.HTTP_PROXY,
-        'https': Config.HTTPS_PROXY
-    }
+async def http_get(info_obj, params, cookie=None):
 
     # 获取请求头信息
     new_http_header = http_header(info_obj)
@@ -170,31 +166,25 @@ def http_get(info_obj, params, cookie=None):
         cookie = dict()
 
     # 尝试进行网络连接
-    client = requests.session()
-    client.mount("http://", HTTPAdapter(max_retries=5))
-    client.mount("https://", HTTPAdapter(max_retries=5))
-
-    try:
-        http_result = client.get(url=info_obj['url'], params=params, cookies=cookie,
-                                 headers=new_http_header, timeout=5, proxies=proxies)
-    except requests.exceptions:
-        raise ConnectError('多次网络请求均未能获得数据：{}'.format(info_obj['url']))
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=info_obj['url'], params=params, cookies=cookie,
+                               headers=new_http_header, timeout=5) as response:
+            http_result = await response.text()
 
     # 尝试理解并验证响应数据
-    if http_result.status_code == 200:
-        try:
-            json_data = json.loads(http_result.text)
-        except json.decoder.JSONDecodeError:
-            raise RunningError('请求响应无法解析：{}'.format(http_result.text))
+    try:
+        json_data = json.loads(http_result)
+    except json.decoder.JSONDecodeError:
+        raise RunningError('请求响应无法解析：{}'.format(http_result))
 
-        if 'code' in json_data and json_data['code'] == 0:
-            return json_data
-        elif 'status' in json_data and json_data['status'] is True:
-            return json_data
-        elif json_data['code'] == -404 or json_data['code'] == -403:
-            raise RunningError('请求对象异常或被锁定，无法获取')
+    if 'code' in json_data and json_data['code'] == 0:
+        return json_data
+    elif 'status' in json_data and json_data['status'] is True:
+        return json_data
+    elif json_data['code'] == -404 or json_data['code'] == -403:
+        raise RunningError('请求对象异常或被锁定，无法获取')
     else:
-        raise ConnectError('网络响应状态异常，HTTP响应码：{}'.format(http_result.status_code))
+        raise ConnectError('网络响应状态异常，HTTP响应码：{}'.format(response.status))
 
 
 def legalize_name(name):
@@ -224,7 +214,7 @@ def aria2c_pull(aid, path, name, url_list, show_process=False):
     process.wait()
 
 
-def ffmpeg_merge(path, name, show_process=False):
+async def ffmpeg_merge(path, name, show_process=False):
     if show_process:
         out_pipe = None
     else:
@@ -243,6 +233,19 @@ def ffmpeg_merge(path, name, show_process=False):
         os.rename(flv_file, mp4_file)
     else:
         raise RunningError('找不到下载的音视频文件')
+
+
+global_cookie: str = ""
+
+
+def set_cookie(_cookie: str):
+    global global_cookie
+    global_cookie = _cookie
+
+
+def get_cookie() -> str:
+    global global_cookie
+    return global_cookie
 
 
 class ParameterError(Exception):

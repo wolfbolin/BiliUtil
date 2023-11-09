@@ -1,7 +1,8 @@
 import BiliUtil
-from cookie import cookie_info
+import asyncio
 
-if __name__ == '__main__':
+
+async def main():
     # DNA视频下载
     # album = BiliUtil.Album("170001")
     # album = BiliUtil.Album("av170001")
@@ -11,16 +12,19 @@ if __name__ == '__main__':
     # album.set_album("BV17x411w7KC")
     # album.set_by_url("https://www.bilibili.com/video/av170001")
     # album.set_by_url("https://www.bilibili.com/video/BV17x411w7KC")
-
-    # 4K视频下载测试
+    BiliUtil.Util.set_cookie('')
     album = BiliUtil.Album("BV1fK4y1t7hj")
 
-    album_info = album.sync()
+    album_info = await album.sync()
     print(album_info)
 
-    video_list = album.get_video_list()
+    video_list = await album.get_video_list()
     print(video_list)
     for video in video_list:
-        video.sync(cookie=cookie_info)
+        await video.sync()
         task = BiliUtil.Task(video, 'D:/BiliUtil', album.aid)
-        task.start()
+        await task.start()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

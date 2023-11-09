@@ -7,7 +7,6 @@ from typing import Optional, List, Union, Dict, Any
 import BiliUtil.Util as Util
 
 
-
 class User:
     def __init__(self, uid: Optional[Union[int, str]] = None) -> None:
         self.uid: Optional[str] = str(uid) if uid is not None else None
@@ -29,7 +28,7 @@ class User:
         uid = re.match('/([0-9]+)', input_url.path).group(1)
         self.uid = str(uid)
 
-    def sync(self, cookie: Optional[str] = None) -> Dict[str, Any]:
+    async def sync(self) -> Dict[str, Any]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取用户信息的必要参数')
@@ -38,11 +37,11 @@ class User:
             'info_obj': Util.USER,
             'params': {
                 'mid': str(self.uid),
-                'jsonp': 'jsonp'
+                'platform': 'web'
             },
-            'cookie': cookie
+            'cookie': Util.get_cookie()
         }
-        json_data = Util.http_get(**http_request)
+        json_data = await Util.http_get(**http_request)
 
         # 修改对象信息
         self.name = json_data['data']['name']
@@ -77,7 +76,8 @@ class User:
         # 返回频道列表
         return channel_list
 
-    def get_album_list(self, cookie: Optional[str] = None, count: int = Util.FetchConfig.ALL) -> List[Video.Album]:
+    async def get_album_list(self, count: int = Util.FetchConfig.ALL) -> List[
+        Video.Album]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取视频列表的必要参数')
@@ -91,11 +91,49 @@ class User:
                 'pn': 1,
                 'order': 'pubdate'
             },
-            'cookie': cookie
+            'cookie': Util.get_cookie()
         }
         album_list = []
         while True:
-            json_data = Util.http_get(**http_request)
+            json_data = await Util.http_get(**http_request)
+
+            new_album_list = [Video.Album(av['aid']) for av in json_data['data']['list']['vlist']]
+            if count != Util.FetchConfig.ALL and len(album_list) + len(new_album_list) >= count:
+                album_list.extend(new_album_list[:count - len(album_list)])
+                break
+
+            # 循环获取列表
+            album_list.extend([Video.Album(av['aid']) for av in json_data['data']['list']['vlist']])
+
+            if len(album_list) < int(json_data['data']['page']['count']):
+                http_request['params']['pn'] += 1
+            else:
+                break
+
+        # 返回视频列表
+        return album_list
+
+    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL) -> List[
+        Video.Album]:
+        # 检验必要的参数
+        if self.uid is None:
+            raise Util.ParameterError('缺少获取视频列表的必要参数')
+        # 发送网络请求
+        http_request = {
+            'info_obj': Util.USER_VIDEO,
+            'params': {
+                'keyword': keyword,
+                'mid': str(self.uid),
+                'pagesize': 30,
+                'tid': 0,
+                'pn': 1,
+                'order': 'pubdate'
+            },
+            'cookie': Util.get_cookie()
+        }
+        album_list = []
+        while True:
+            json_data = await Util.http_get(**http_request)
 
             new_album_list = [Video.Album(av['aid']) for av in json_data['data']['list']['vlist']]
             if count != Util.FetchConfig.ALL and len(album_list) + len(new_album_list) >= count:
