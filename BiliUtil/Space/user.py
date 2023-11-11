@@ -112,7 +112,8 @@ class User:
         # 返回视频列表
         return album_list
 
-    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL,tid:int = 0) -> List[Video.Album]:
+    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL, tid: int = 0) -> \
+            List[Video.Album]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取视频列表的必要参数')

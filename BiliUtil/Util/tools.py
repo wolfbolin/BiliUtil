@@ -259,19 +259,19 @@ mixinKeyEncTab = [
 
 
 def getMixinKey(orig: str):
-    '对 imgKey 和 subKey 进行字符顺序打乱编码'
+    """对 imgKey 和 subKey 进行字符顺序打乱编码"""
     return reduce(lambda s, i: s + orig[i], mixinKeyEncTab, '')[:32]
 
 
 def encWbi(params: dict, img_key: str, sub_key: str):
-    '为请求参数进行 wbi 签名'
+    """为请求参数进行 wbi 签名"""
     mixin_key = getMixinKey(img_key + sub_key)
     curr_time = round(time.time())
     params['wts'] = curr_time  # 添加 wts 字段
     params = dict(sorted(params.items()))  # 按照 key 重排参数
     # 过滤 value 中的 "!'()*" 字符
     params = {
-        k: ''.join(filter(lambda chr: chr not in "!'()*", str(v)))
+        k: ''.join(filter(lambda char: char not in "!'()*", str(v)))
         for k, v
         in params.items()
     }
@@ -282,7 +282,7 @@ def encWbi(params: dict, img_key: str, sub_key: str):
 
 
 def getWbiKeys() -> tuple[str, str]:
-    '获取最新的 img_key 和 sub_key'
+    """获取最新的 img_key 和 sub_key"""
     resp = requests.get('https://api.bilibili.com/x/web-interface/nav')
     resp.raise_for_status()
     json_content = resp.json()
@@ -294,7 +294,7 @@ def getWbiKeys() -> tuple[str, str]:
 
 
 def enc_params(params: dict) -> dict:
-    '为请求参数进行 wbi 签名'
+    """为请求参数进行 wbi 签名"""
     img_key, sub_key = getWbiKeys()
     return encWbi(params, img_key, sub_key)
 

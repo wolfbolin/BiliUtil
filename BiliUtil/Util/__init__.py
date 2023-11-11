@@ -22,3 +22,4 @@ from .tools import FetchConfig
 from .tools import set_cookie
 from .tools import get_cookie
 from .tools import enc_params
+from .tools import ConnectError

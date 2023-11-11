@@ -1,13 +1,13 @@
 # coding=utf-8
 from __future__ import annotations
+
 import os
 import re
-import warnings
 
 from . import Util, Space
 from .Space import User
-from .Video import Album
 from .Util import Config
+from .Video import Album, Task
 
 # 检查ffmpeg是否安装
 ffmpeg_result = os.popen('ffmpeg -version').read()
