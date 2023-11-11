@@ -1,4 +1,5 @@
 import BiliUtil
+
 if __name__ == '__main__':
     cookie = ""
     cache = "D:/BiliUtil"
@@ -10,7 +11,7 @@ if __name__ == '__main__':
     print(user_info)
 
     fetcher = BiliUtil.Fetcher(user)
-    av_list = fetcher.fetch_all(cookie, BiliUtil.Config.SET_AS_NAME)
+    av_list = fetcher.fetch_av_list(BiliUtil.Config.SET_AS_NAME)
     print(av_list)
 
     positive_list, negative_list = fetcher.load_exist(cache)
@@ -20,4 +21,3 @@ if __name__ == '__main__':
     task_id = fetcher.load_task(cache, positive_list)
     download_list = fetcher.pull_all()
     print('完成{}个视频下载：{}'.format(len(download_list), download_list))
-

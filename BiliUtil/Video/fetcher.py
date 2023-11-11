@@ -19,11 +19,10 @@ class Fetcher:
         self.task_list: Optional[List[Task]] = None
         self.exist_list: Optional[List[str]] = None
 
-    async def fetch_av_list(self, cookie: Optional[str] = None, name_pattern: int = Util.Config.SET_AS_CODE,
-                      quality: Optional[int] = None, count: int = Util.FetchConfig.ALL) -> List[str]:
+    async def fetch_av_list(self, name_pattern: int = Util.Config.SET_AS_CODE,
+                            quality: Optional[int] = None, count: int = Util.FetchConfig.ALL) -> List[str]:
         av_list = []
         self.info_list = []
-        _cookie = cookie
 
         if isinstance(self.obj, User):
             obj_code = self.obj.uid
@@ -42,13 +41,13 @@ class Fetcher:
 
         album_list = await self.obj.get_album_list(count=count)
         for album in album_list:
-            album.sync(cookie)
+            await album.sync()
             if album.is_upower_exclusive is True:  # 充电专属稿件跳过
                 continue
             album_name = album.album_name(name_pattern)
-            video_list = album.get_video_list()
+            video_list = await album.get_video_list()
             for video in video_list:
-                video.sync(cookie, quality)
+                await video.sync(quality)
                 video_name = video.video_name(name_pattern)
 
                 self.info_list.append({
@@ -100,9 +99,7 @@ class Fetcher:
 
         return positive_list, negative_list
 
-    def pull_all(self, show_process: bool = True, no_repeat: bool = True) -> List[str]:
+    def pull_all(self, show_process: bool = True, no_repeat: bool = True):
         av_list = []
         for task in self.task_list:
             av_list.append(task.start(show_process, no_repeat))
-        av_list = list(set(av_list))
-        return av_list

@@ -1,14 +1,12 @@
 # coding=utf-8
+import json
 import os
 import re
-import time
-import json
-import requests
 import subprocess
 from urllib import parse
-from fake_useragent import UserAgent
-from requests.adapters import HTTPAdapter
+
 import aiohttp
+from fake_useragent import UserAgent
 
 
 # from BiliUtil import http_proxy, https_proxy
@@ -133,7 +131,6 @@ def to_av(vid):
 
 def http_header(info_obj):
     header = HEADER.copy()
-    useragent_path = os.path.dirname(__file__) + '/fake_useragent.json'
     header['Host'] = parse.urlparse(info_obj['url']).netloc
     header['User-Agent'] = UserAgent().random
     header['Origin'] = info_obj['origin']

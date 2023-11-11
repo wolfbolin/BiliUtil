@@ -57,7 +57,7 @@ class User:
         # 返回用户信息
         return copy.deepcopy(vars(self))
 
-    def get_channel_list(self, cookie: Optional[str] = None) -> List[Channel]:
+    async def get_channel_list(self, cookie: Optional[str] = None) -> List[Channel]:
         if self.uid is None:
             raise BaseException('缺少获取频道列表的必要参数')
 
@@ -71,14 +71,13 @@ class User:
             },
             'cookie': cookie
         }
-        json_data = Util.http_get(**http_request)
+        json_data = await Util.http_get(**http_request)
         channel_list = list(Channel(self.uid, ch['cid']) for ch in json_data['data']['list'])
 
         # 返回频道列表
         return channel_list
 
-    async def get_album_list(self, count: int = Util.FetchConfig.ALL) -> List[
-        Video.Album]:
+    async def get_album_list(self, count: int = Util.FetchConfig.ALL) -> List[Video.Album]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取视频列表的必要参数')
@@ -114,8 +113,7 @@ class User:
         # 返回视频列表
         return album_list
 
-    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL) -> List[
-        Video.Album]:
+    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL) -> List[Video.Album]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取视频列表的必要参数')

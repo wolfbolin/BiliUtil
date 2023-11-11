@@ -11,6 +11,7 @@ video_cache = r'D:\Bilibili'
 cookie = "SESSDATA=7f110a70%YbWeLCx2F7xXKJ8A%2C6c989ea1"  # 假的
 
 # 设置代理信息
+BiliUtil.Util.set_cookie(cookie)
 BiliUtil.Config.HTTP_PROXY = 'http://127.0.0.1:8888'
 BiliUtil.Config.HTTPS_PROXY = 'http://127.0.0.1:8888'
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
         print('正在下载用户:{} 的视频'.format(up[1]))
         user = BiliUtil.User(up[0])
         fetcher = BiliUtil.Fetcher(user)
-        av_list = fetcher.fetch_all(cookie, BiliUtil.Config.SET_AS_NAME)
+        av_list = fetcher.fetch_av_list(BiliUtil.Config.SET_AS_NAME)
         print(av_list)
         positive_list, negative_list = fetcher.load_exist(video_cache)
         exclude_list = positive_list + up[2]

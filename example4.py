@@ -1,6 +1,6 @@
 # coding=utf-8
 import BiliUtil
-from cookie import cookie
+
 
 user_list = [
     ("89916351", "半柠檬", [53712835, "26994127"]),
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         print('正在下载用户:{} 的视频'.format(up[1]))
         user = BiliUtil.User(up[0])
         fetcher = BiliUtil.Fetcher(user)
-        av_list = fetcher.fetch_all(cookie, BiliUtil.Config.SET_AS_NAME)
+        av_list = fetcher.fetch_av_list(BiliUtil.Config.SET_AS_NAME)
         print('视频列表:', av_list)
         positive_list, negative_list = fetcher.load_exist(video_cache)
         print('已存列表:', positive_list)

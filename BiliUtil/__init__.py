@@ -4,9 +4,10 @@ import os
 import re
 import warnings
 
-from . import Util, Video, Space
+from . import Util, Space
 from .Space import User
-
+from .Video import Album
+from .Util import Config
 _aria2c_result = os.popen('aria2c -v').read()
 _aria2c_result = re.match(r'(\S+)', _aria2c_result)
 _ffmpeg_result = os.popen('ffmpeg -version').read()
