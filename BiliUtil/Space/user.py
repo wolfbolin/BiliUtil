@@ -36,10 +36,9 @@ class User:
         # 发送网络请求
         http_request = {
             'info_obj': Util.USER,
-            'params': {
+            'params': Util.enc_params({
                 'mid': str(self.uid),
-                'platform': 'web'
-            },
+            }),
             'cookie': Util.get_cookie()
         }
         json_data = await Util.http_get(**http_request)
@@ -113,21 +112,21 @@ class User:
         # 返回视频列表
         return album_list
 
-    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL) -> List[Video.Album]:
+    async def get_album_list_by_search(self, keyword: str = '', count: int = Util.FetchConfig.ALL,tid:int = 0) -> List[Video.Album]:
         # 检验必要的参数
         if self.uid is None:
             raise Util.ParameterError('缺少获取视频列表的必要参数')
         # 发送网络请求
         http_request = {
             'info_obj': Util.USER_VIDEO,
-            'params': {
+            'params': Util.enc_params({
                 'keyword': keyword,
                 'mid': str(self.uid),
                 'pagesize': 30,
-                'tid': 0,
+                'tid': tid,
                 'pn': 1,
                 'order': 'pubdate'
-            },
+            }),
             'cookie': Util.get_cookie()
         }
         album_list = []

@@ -39,10 +39,10 @@ class Task:
         if no_repeat and os.path.exists(os.path.join(self.path, self.name)):
             return None
         if self.level == 'old_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
         elif self.level == 'new_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
-            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
 
         await Util.ffmpeg_merge(self.path, self.name, show_process)
         sys.stdout.flush()
