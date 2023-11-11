@@ -4,7 +4,7 @@ import re
 import copy
 from urllib import parse
 from typing import Optional, List, Tuple, Any, Dict
-import BiliUtil.Util as Util
+from .. import Util, Video
 
 
 class Album:
@@ -94,6 +94,3 @@ class Album:
             await self.sync()
 
         return [Video.Video(self, info[0], info[1], index + 1) for index, info in enumerate(self.video_info)]
-
-
-import BiliUtil.Video as Video

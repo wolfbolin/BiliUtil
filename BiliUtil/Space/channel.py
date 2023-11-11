@@ -2,7 +2,8 @@
 from __future__ import annotations
 import re
 from urllib import parse
-import BiliUtil.Util as Util
+
+from .. import Util, Video
 
 
 class Channel:
@@ -24,11 +25,10 @@ class Channel:
         self.uid = str(uid)
         self.cid = str(cid)
 
-    def get_album_list(self, cookie=None):
+    async def get_album_list(self, cookie=None):
         # 检验必要的参数
         if self.uid is None or self.cid is None:
             raise Util.ParameterError('缺少获取频道列表的必要参数')
-        import BiliUtil.Video as Video
         # 发送网络请求
         http_request = {
             'info_obj': Util.CHANNEL,
@@ -43,7 +43,7 @@ class Channel:
         }
         album_list = []
         while True:
-            json_data = Util.http_get(**http_request)
+            json_data = await Util.http_get(**http_request)
 
             # 修改对象信息
             self.name = json_data['data']['list']['name']

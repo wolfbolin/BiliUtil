@@ -1,6 +1,6 @@
 # coding=utf-8
 import copy
-import BiliUtil.Util as Util
+from .. import Util
 
 
 class Video:

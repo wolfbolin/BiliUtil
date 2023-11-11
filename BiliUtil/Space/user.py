@@ -4,7 +4,8 @@ import re
 import copy
 from urllib import parse
 from typing import Optional, List, Union, Dict, Any
-import BiliUtil.Util as Util
+from .. import Util, Video
+from .channel import Channel
 
 
 class User:
@@ -150,7 +151,3 @@ class User:
 
         # 返回视频列表
         return album_list
-
-
-from .channel import Channel
-import BiliUtil.Video as Video

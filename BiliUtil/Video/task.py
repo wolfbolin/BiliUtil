@@ -3,7 +3,7 @@ import os
 import sys
 import copy
 import requests
-import BiliUtil.Util as Util
+from .. import Util
 
 
 class Task:

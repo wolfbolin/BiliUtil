@@ -2,7 +2,10 @@
 from __future__ import annotations
 import os
 from typing import Optional, List, Union, Tuple, Dict, Any
-import BiliUtil.Util as Util
+from .. import Util
+from ..Space.channel import Channel
+from ..Space.user import User
+from ..Video import Video, Album, Task
 
 
 def get_album(info: Dict[str, Tuple[str, Union[User, Channel, Album, Video]]]) -> Album:
@@ -16,7 +19,7 @@ class Fetcher:
         self.task_list: Optional[List[Task]] = None
         self.exist_list: Optional[List[str]] = None
 
-    def fetch_av_list(self, cookie: Optional[str] = None, name_pattern: int = Util.Config.SET_AS_CODE,
+    async def fetch_av_list(self, cookie: Optional[str] = None, name_pattern: int = Util.Config.SET_AS_CODE,
                       quality: Optional[int] = None, count: int = Util.FetchConfig.ALL) -> List[str]:
         av_list = []
         self.info_list = []
@@ -32,12 +35,12 @@ class Fetcher:
         if name_pattern == Util.Config.SET_AS_CODE:
             obj_name = obj_code
         elif name_pattern in [Util.Config.SET_AS_NAME, Util.Config.SET_AS_PAGE]:
-            self.obj.sync(cookie=_cookie)
+            await self.obj.sync()
             obj_name = Util.legalize_name(self.obj.name)
         else:
             obj_name = "unknown"
 
-        album_list = self.obj.get_album_list(cookie=_cookie, count=count)
+        album_list = await self.obj.get_album_list(count=count)
         for album in album_list:
             album.sync(cookie)
             if album.is_upower_exclusive is True:  # 充电专属稿件跳过
@@ -103,8 +106,3 @@ class Fetcher:
             av_list.append(task.start(show_process, no_repeat))
         av_list = list(set(av_list))
         return av_list
-
-
-from BiliUtil.Space.channel import Channel
-from BiliUtil.Space.user import User
-from BiliUtil.Video import Video, Album, Task
