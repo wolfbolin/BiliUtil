@@ -149,13 +149,11 @@ async def http_get(info_obj, params, cookie=None):
                 'SESSDATA': cookie['SESSDATA']
             }
         elif isinstance(cookie, str) and len(cookie) > 0:
-            for line in cookie.split(';'):
-                name, value = line.strip().split('=', 1)
-                if name == 'SESSDATA':
-                    cookie = {
-                        'SESSDATA': value
-                    }
-                    break
+            tmp = {
+                'SESSDATA': cookie
+            }
+            cookie = tmp
+
         else:
             cookie = dict()
     else:
