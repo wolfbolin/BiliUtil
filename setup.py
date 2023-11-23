@@ -8,7 +8,6 @@ import io
 import os
 import sys
 from shutil import rmtree
-
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
@@ -18,7 +17,7 @@ URL = 'https://github.com/wolfbolin/BiliUtil'
 EMAIL = 'mailto@wolfbolin.com'
 AUTHOR = 'WolfBolin'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = None
+VERSION = ''
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -88,7 +87,7 @@ class UploadCommand(Command):
         self.status('Pushing git tags…')
         os.system('git tag v{0}'.format(about['__version__']))
         os.system('git push --tags')
-        
+
         sys.exit()
 
 

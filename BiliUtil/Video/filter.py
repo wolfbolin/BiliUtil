@@ -1,5 +1,5 @@
 # coding=utf-8
-import BiliUtil.Util as Util
+from .. import Util
 
 
 class Filter:

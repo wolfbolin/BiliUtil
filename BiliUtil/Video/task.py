@@ -3,14 +3,12 @@ import os
 import sys
 import copy
 import requests
-import BiliUtil.Util as Util
+from .. import Util
 
 
 class Task:
     def __init__(self, video, output, name, cover=None):
         self.video_info = copy.deepcopy(vars(video))
-        del self.video_info['video']
-        del self.video_info['audio']
         self.aid = video.album.aid
         self.level = video.level
         self.video = video.video
@@ -19,7 +17,7 @@ class Task:
         self.name = name
         self.path = os.path.abspath(output)
 
-    def start(self, show_process=True, no_repeat=True):
+    async def start(self, show_process=True, no_repeat=True):
         """
         开始下载任务
         :param show_process: 是否显示下载进度信息
@@ -41,11 +39,11 @@ class Task:
         if no_repeat and os.path.exists(os.path.join(self.path, self.name)):
             return None
         if self.level == 'old_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
         elif self.level == 'new_version':
-            Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
-            Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.aac', self.audio, show_process)
+            await Util.aria2c_pull(self.aid, self.path, self.name + '.flv', self.video, show_process)
 
-        Util.ffmpeg_merge(self.path, self.name, show_process)
+        await Util.ffmpeg_merge(self.path, self.name, show_process)
         sys.stdout.flush()
         return self.aid

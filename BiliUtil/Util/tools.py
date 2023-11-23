@@ -1,16 +1,17 @@
 # coding=utf-8
+import json
 import os
 import re
-import time
-import json
-import requests
 import subprocess
 from urllib import parse
+
+import aiohttp
 from fake_useragent import UserAgent
-from requests.adapters import HTTPAdapter
 
 
 # from BiliUtil import http_proxy, https_proxy
+class FetchConfig:
+    ALL = 0
 
 
 class Config:
@@ -55,12 +56,12 @@ HEADER = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7'
 }
 USER = {
-    'url': 'http://api.bilibili.com/x/space/acc/info',
+    'url': 'http://api.bilibili.com/x/space/wbi/acc/info',
     'origin': 'https://space.bilibili.com',
     'referer': 'https://space.bilibili.com'
 }
 USER_VIDEO = {
-    'url': 'http://space.bilibili.com/ajax/member/getSubmitVideos',
+    'url': 'http://api.bilibili.com/x/space/wbi/arc/search',
     'origin': 'https://space.bilibili.com',
     'referer': 'https://space.bilibili.com'
 }
@@ -130,21 +131,14 @@ def to_av(vid):
 
 def http_header(info_obj):
     header = HEADER.copy()
-    useragent_path = os.path.dirname(__file__) + '/fake_useragent.json'
     header['Host'] = parse.urlparse(info_obj['url']).netloc
-    header['User-Agent'] = UserAgent(path=useragent_path).random
+    header['User-Agent'] = UserAgent().random
     header['Origin'] = info_obj['origin']
     header['Referer'] = info_obj['referer']
     return header
 
 
-def http_get(info_obj, params, cookie=None):
-    # 获取代理配置
-    proxies = {
-        'http': Config.HTTP_PROXY,
-        'https': Config.HTTPS_PROXY
-    }
-
+async def http_get(info_obj, params, cookie=None):
     # 获取请求头信息
     new_http_header = http_header(info_obj)
 
@@ -155,44 +149,36 @@ def http_get(info_obj, params, cookie=None):
                 'SESSDATA': cookie['SESSDATA']
             }
         elif isinstance(cookie, str) and len(cookie) > 0:
-            for line in cookie.split(';'):
-                name, value = line.strip().split('=', 1)
-                if name == 'SESSDATA':
-                    cookie = {
-                        'SESSDATA': value
-                    }
-                    break
+            tmp = {
+                'SESSDATA': cookie
+            }
+            cookie = tmp
+
         else:
             cookie = dict()
     else:
         cookie = dict()
 
     # 尝试进行网络连接
-    client = requests.session()
-    client.mount("http://", HTTPAdapter(max_retries=5))
-    client.mount("https://", HTTPAdapter(max_retries=5))
-
-    try:
-        http_result = client.get(url=info_obj['url'], params=params, cookies=cookie,
-                                 headers=new_http_header, timeout=5, proxies=proxies)
-    except requests.exceptions:
-        raise ConnectError('多次网络请求均未能获得数据：{}'.format(info_obj['url']))
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=info_obj['url'], params=params, cookies=cookie,
+                               headers=new_http_header, timeout=5) as response:
+            http_result = await response.text()
 
     # 尝试理解并验证响应数据
-    if http_result.status_code == 200:
-        try:
-            json_data = json.loads(http_result.text)
-        except json.decoder.JSONDecodeError:
-            raise RunningError('请求响应无法解析：{}'.format(http_result.text))
+    try:
+        json_data = json.loads(http_result)
+    except json.decoder.JSONDecodeError:
+        raise RunningError('请求响应无法解析：{}'.format(http_result))
 
-        if 'code' in json_data and json_data['code'] == 0:
-            return json_data
-        elif 'status' in json_data and json_data['status'] is True:
-            return json_data
-        elif json_data['code'] == -404 or json_data['code'] == -403:
-            raise RunningError('请求对象异常或被锁定，无法获取')
+    if 'code' in json_data and json_data['code'] == 0:
+        return json_data
+    elif 'status' in json_data and json_data['status'] is True:
+        return json_data
+    elif json_data['code'] == -404 or json_data['code'] == -403:
+        raise RunningError('请求对象异常或被锁定，无法获取')
     else:
-        raise ConnectError('网络响应状态异常，HTTP响应码：{}'.format(http_result.status_code))
+        raise ConnectError('网络响应状态异常，HTTP响应码：{}'.format(response.status))
 
 
 def legalize_name(name):
@@ -203,26 +189,26 @@ def legalize_name(name):
     return legal_name
 
 
-def aria2c_pull(aid, path, name, url_list, show_process=False):
+async def aria2c_pull(aid, path, name, url_list, show_process=False):
     # 设置输出信息
-    if show_process:
-        out_pipe = None
-    else:
-        out_pipe = subprocess.PIPE
-    # 读取代理信息
-    proxies = ''
-    proxies += ' --http-proxy="{}"'.format(Config.HTTP_PROXY) if Config.HTTP_PROXY is not None else ""
-    proxies += ' --https-proxy="{}"'.format(Config.HTTPS_PROXY) if Config.HTTPS_PROXY is not None else ""
+    out_pipe = None if show_process else subprocess.PIPE
 
-    referer = 'https://www.bilibili.com/video/av' + str(aid)
-    url = '"{}"'.format('" "'.join(url_list))
-    shell = 'aria2c -c -k 1M -x {} -d "{}" -o "{}" --referer="{}" {} {}'
-    shell = shell.format(len(url_list), path, name, referer, proxies, url)
+    # 读取代理信息
+    http_proxy = Config.HTTP_PROXY if Config.HTTP_PROXY is not None else ""
+    https_proxy = Config.HTTPS_PROXY if Config.HTTPS_PROXY is not None else ""
+
+    proxies = f' --http-proxy="{http_proxy}"' if http_proxy else ""
+    proxies += f' --https-proxy="{https_proxy}"' if https_proxy else ""
+
+    referer = f'https://www.bilibili.com/video/av{aid}'
+    url = ' '.join(f'"{u}"' for u in url_list)
+    shell = f'aria2c -c -k 1M -x {len(url_list)} -d "{path}" -o "{name}" --referer="{referer}" {proxies} {url}'
+
     process = subprocess.Popen(shell, stdout=out_pipe, stderr=out_pipe, shell=True)
     process.wait()
 
 
-def ffmpeg_merge(path, name, show_process=False):
+async def ffmpeg_merge(path, name, show_process=False):
     if show_process:
         out_pipe = None
     else:
@@ -241,6 +227,74 @@ def ffmpeg_merge(path, name, show_process=False):
         os.rename(flv_file, mp4_file)
     else:
         raise RunningError('找不到下载的音视频文件')
+
+
+global_cookie: str = ""
+
+
+def set_cookie(_cookie: str):
+    global global_cookie
+    global_cookie = _cookie
+
+
+def get_cookie() -> str:
+    global global_cookie
+    return global_cookie
+
+
+from functools import reduce
+from hashlib import md5
+import urllib.parse
+import time
+import requests
+
+mixinKeyEncTab = [
+    46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+    33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+    61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
+    36, 20, 34, 44, 52
+]
+
+
+def getMixinKey(orig: str):
+    """对 imgKey 和 subKey 进行字符顺序打乱编码"""
+    return reduce(lambda s, i: s + orig[i], mixinKeyEncTab, '')[:32]
+
+
+def encWbi(params: dict, img_key: str, sub_key: str):
+    """为请求参数进行 wbi 签名"""
+    mixin_key = getMixinKey(img_key + sub_key)
+    curr_time = round(time.time())
+    params['wts'] = curr_time  # 添加 wts 字段
+    params = dict(sorted(params.items()))  # 按照 key 重排参数
+    # 过滤 value 中的 "!'()*" 字符
+    params = {
+        k: ''.join(filter(lambda char: char not in "!'()*", str(v)))
+        for k, v
+        in params.items()
+    }
+    query = urllib.parse.urlencode(params)  # 序列化参数
+    wbi_sign = md5((query + mixin_key).encode()).hexdigest()  # 计算 w_rid
+    params['w_rid'] = wbi_sign
+    return params
+
+
+def getWbiKeys() -> tuple[str, str]:
+    """获取最新的 img_key 和 sub_key"""
+    resp = requests.get('https://api.bilibili.com/x/web-interface/nav')
+    resp.raise_for_status()
+    json_content = resp.json()
+    img_url: str = json_content['data']['wbi_img']['img_url']
+    sub_url: str = json_content['data']['wbi_img']['sub_url']
+    img_key = img_url.rsplit('/', 1)[1].split('.')[0]
+    sub_key = sub_url.rsplit('/', 1)[1].split('.')[0]
+    return img_key, sub_key
+
+
+def enc_params(params: dict) -> dict:
+    """为请求参数进行 wbi 签名"""
+    img_key, sub_key = getWbiKeys()
+    return encWbi(params, img_key, sub_key)
 
 
 class ParameterError(Exception):
